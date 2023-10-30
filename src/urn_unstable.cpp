@@ -80,7 +80,7 @@ class UrnOR
                 return (*m_urn).draw(m_ordinalnumber);
             }
 
-            /*const*/ Iterator operator++()
+            /*const*/ Iterator operator++() //Iterator&
             {   
                 if (m_status == Status::begin)
                 {
@@ -110,7 +110,7 @@ class UrnOR
                 return temp;
             }
             
-            /*const*/ Iterator operator--()
+            /*const*/ Iterator operator--() //Iterator&
             {   
                 if(m_status == Status::end)
                 {
@@ -154,8 +154,8 @@ class UrnOR
                 return !(a == b); 
             }
 
-            //Addition mit +=
-            Iterator& operator+=(const difference_type other)
+            //Addition mit += (bei allen additionen und subtraktionen Klammerausdrücke testen in catch2)
+            /*const*/ Iterator& operator+=(const difference_type& other)
             {   
                 if(other >= 0)
                 {
@@ -164,12 +164,45 @@ class UrnOR
                         ++(*this);
                     }
                 }
-                else
-                //m_iterator += other; return *this;
+                else if(other < 0)
+                {   
+                    long int positivOther {other * -1};
+                    for(uint decCount{}; decCount < positivOther; ++decCount)
+                    {
+                        --(*this);
+                    }
+                }
+                return *this;
+            }
+            //Addition mit +
+            Iterator operator+(const difference_type& other) const //ist besser ohne const
+            { 
+                auto temp {*this};
+                return (temp += other);
+            }
+
+            //Subtraktion mit -=
+            /*const*/ Iterator& operator-=(const difference_type& other)
+            {
+                long int negativOther {other * -1};
+                (*this) += negativOther;
                 return *this;
             }
 
-            
+            //Subtraktion mit -
+            Iterator operator-(const difference_type& other) const
+            { 
+                auto temp {*this};
+                return (temp -= other);
+            }
+
+            //Difference
+            //Funktioniert noch nicht ganz richtig für rbegin - rend wegen uint max
+            difference_type operator-(const Iterator& other)
+            { 
+                return m_ordinalnumber - other.m_ordinalnumber;
+            }
+
             ~Iterator() = default;
 
         protected:
@@ -328,6 +361,25 @@ int main()
 {   
     UrnOR urn {2,2};
 
+    cout << "+= und -=" << endl;
+    auto it {urn.begin()};
+    cout << to_string(*it) << endl;
+    it += 2;
+    cout << to_string(*it) << endl;
+    it -= 1;
+    cout << to_string(*it) << endl;
+    it -= 0;
+    cout << to_string(*it) << endl;
+
+    cout << "+ und -" << endl;
+    auto it1 {urn.begin()};
+    cout << to_string(*it1) << endl;
+    it1 = it1 + 2;
+    cout << to_string(*it1) << endl;
+    it1 = it1 - 1;
+    cout << to_string(*it1) << endl;
+    it1 = it1 - 0;
+    cout << to_string(*it1) << endl;
 
     /*
     auto it {urn.begin()};
@@ -342,8 +394,6 @@ int main()
         cout << to_string(*it) << endl;
         ++it;
     }
-
-
 
     auto it1 {urn.end()};
     auto it2 {urn.end()};
