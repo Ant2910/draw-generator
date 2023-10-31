@@ -6,6 +6,7 @@
 #include <iterator>
 #include <type_traits>
 #include <concepts>
+#include <limits>
 using namespace std;
 
 using uint = unsigned int;
@@ -51,6 +52,27 @@ class UrnOR
                                                                                          m_ordinalnumber{ ordinalnumber },
                                                                                          m_status { status }{}
 
+            string stat()
+            {   
+                if(m_status == Status::begin)
+                {
+                    return "begin";
+                }
+                if(m_status == Status::end)
+                {
+                    return "end";
+                }
+                if(m_status == Status::valid)
+                {
+                    return "valid";
+                }
+                if(m_status == Status::invalid)
+                {
+                    return "invalid";
+                }
+                return "Fail";
+            }
+
             uint n() const
             {
                 return (*m_urn).n();
@@ -92,7 +114,7 @@ class UrnOR
                     ++m_ordinalnumber;
                     m_status = Status::valid;
                 }
-                if(m_ordinalnumber == z())//(m_ordinalnumber >= z())
+                if(m_ordinalnumber == z())  //(m_ordinalnumber >= z())
                 {
                     m_status = Status::end;
                 }
@@ -115,7 +137,7 @@ class UrnOR
                 if(m_status == Status::end)
                 {
                     m_status = Status::valid;
-                    m_ordinalnumber = m_urn->z() - 1;
+                    m_ordinalnumber = m_urn->z() - 1;   //Warum nicht z() - 1?
                 }
                 else if(m_status != Status::begin)
                 {   
@@ -128,9 +150,13 @@ class UrnOR
                     m_status = Status::begin;
                 }
                 */
-                if(m_ordinalnumber > z())
+                
+                //wann wird Status zu begin?? -> eins vor dem ersten Draw?
+                //d.h. wenn wir mit uint arbeiten wäre es dann max(uint) -> 4294967295 danach dann invalid
+                
+                if(m_ordinalnumber > z())       //nur eine Übergangslösung
                 {
-                    m_status = Status::invalid;
+                    m_status = Status::begin;
                 }
                 return *this;
             }
@@ -146,7 +172,7 @@ class UrnOR
             { 
                 return (a.m_ordinalnumber == b.m_ordinalnumber) || 
                     (a.m_status == Status::end && b.m_status == Status::end) ||
-                    (a.m_status == Status::begin && b.m_status == Status::begin);
+                    (a.m_status == Status::begin && b.m_status == Status::begin); //wird mit der alten Version nicht aufgerufen
             }   
 
             friend bool operator!= (const Iterator& a, const Iterator& b)
@@ -198,11 +224,12 @@ class UrnOR
 
             //Difference
             //Funktioniert noch nicht ganz richtig für rbegin - rend wegen uint max
+            /*
             difference_type operator-(const Iterator& other)
             { 
                 return m_ordinalnumber - other.m_ordinalnumber;
             }
-
+            */
             ~Iterator() = default;
 
         protected:
@@ -360,7 +387,23 @@ class UrnOR
 int main()
 {   
     UrnOR urn {2,2};
-
+    
+    auto it {urn.begin()};
+    cout << it.ordinalnumber() << endl;
+    cout << it.stat() << endl;
+    it -= 1;
+    cout << it.ordinalnumber() << endl;
+    cout << it.stat() << endl;
+    it -= 1;
+    cout << it.ordinalnumber() << endl;
+    cout << it.stat() << endl;
+    it -= 1;
+    cout << it.ordinalnumber() << endl;
+    cout << it.stat() << endl;
+    it -= 1;
+    cout << it.ordinalnumber() << endl;
+    
+    
     cout << "+= und -=" << endl;
     auto it {urn.begin()};
     cout << to_string(*it) << endl;
@@ -380,7 +423,7 @@ int main()
     cout << to_string(*it1) << endl;
     it1 = it1 - 0;
     cout << to_string(*it1) << endl;
-
+    
     /*
     auto it {urn.begin()};
 
