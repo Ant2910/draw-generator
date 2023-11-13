@@ -9,13 +9,13 @@
 #include <limits>
 using namespace std;
 
-//using uint = int; //unsigned int
-using Draw = std::vector<int>;
+using uint = unsigned int; 
+using Draw = std::vector<uint>;
 
 string to_string(const Draw& draw)
 {   
     string stdraw {};
-    for(int posCount{}; posCount < draw.size(); ++posCount)
+    for(uint posCount{}; posCount < draw.size(); ++posCount)
     {
         stdraw += to_string(draw.at(posCount));
         if(posCount != (draw.size()-1))
@@ -48,21 +48,32 @@ class UrnOR
                 invalidBack
             };
             
-            Iterator(const UrnOR* urn, const int& ordinalnumber, const Status& status): m_urn{ urn },
-                                                                                         m_ordinalnumber{ ordinalnumber },
+            Iterator(const UrnOR* urn, const uint& ordinalnumber, const Status& status): m_urn{ urn },
+                                                                                         m_ordinalnumber{ static_cast<int>(ordinalnumber) },
                                                                                          m_status { status }{}
             
-            int n() const
+            string status() const
+            {
+                switch(m_status)
+                {
+                    case Status::invalidFront: return "invalidFront"; break;
+                    case Status::valid: return "valid"; break;
+                    case Status::invalidBack: return "invalidBack"; break;
+                    default: throw std::invalid_argument("m_status is invalid."); break;
+                }
+            }
+
+            uint n() const
             {
                 return (*m_urn).n();
             }
 
-            int k() const
+            uint k() const
             {
                 return (*m_urn).k();
             }
 
-            int z() const
+            uint z() const
             {
                 return (*m_urn).z();
             }
@@ -83,6 +94,23 @@ class UrnOR
 
             /*const*/ Iterator operator++() //Iterator&
             {   
+                ++m_ordinalnumber;
+                
+                if(m_ordinalnumber == 0)
+                {  
+                    m_status = Status::valid;
+                }
+                else if(m_ordinalnumber < 0)
+                {
+                    m_status = Status::invalidFront;
+                }
+                else if(m_ordinalnumber >= z())
+                {
+                    m_status = Status::invalidBack;
+                }
+                
+                return *this;
+                /*
                 if (m_status == Status::invalidFront)
                 {
                     m_status = Status::valid;
@@ -94,10 +122,11 @@ class UrnOR
                     m_status = Status::valid;
                 }
                 if(m_ordinalnumber >= z())
-                {
+                {   
                     m_status = Status::invalidBack;
                 }
                 return *this;
+                */
             }
                 
             /*const*/ Iterator operator++(int)
@@ -109,6 +138,21 @@ class UrnOR
             
             /*const*/ Iterator operator--() //Iterator&
             {   
+                --m_ordinalnumber;
+                if(m_ordinalnumber == z()-1)
+                {  
+                    m_status = Status::valid;
+                }
+                else if(m_ordinalnumber < 0)
+                {
+                    m_status = Status::invalidFront;
+                }
+                else if(m_ordinalnumber >= z())
+                {
+                    m_status = Status::invalidBack;
+                }
+                return *this;
+                /*
                 if(m_status == Status::invalidBack)
                 {
                     m_status = Status::valid;
@@ -124,6 +168,7 @@ class UrnOR
                     m_status = Status::invalidFront;
                 }
                 return *this;
+                */
             }
             
             /*const*/ Iterator operator--(int)
@@ -170,7 +215,7 @@ class UrnOR
             {   
                 if(other >= 0)
                 {
-                    for(int incCount{}; incCount < other; ++incCount)
+                    for(uint incCount{}; incCount < other; ++incCount)
                     {
                         ++(*this);
                     }
@@ -178,7 +223,7 @@ class UrnOR
                 else if(other < 0)
                 {   
                     long int positivOther {other * -1};
-                    for(int decCount{}; decCount < positivOther; ++decCount)
+                    for(uint decCount{}; decCount < positivOther; ++decCount)
                     {
                         --(*this);
                     }
@@ -226,7 +271,6 @@ class UrnOR
                 return (*m_urn).draw(index);
             }
 
-
             ~Iterator() = default;
 
         protected:
@@ -236,14 +280,10 @@ class UrnOR
     };
 
     public:
-        explicit UrnOR(int n,int k,int check = 1):m_n { n },
-                                                  m_k { k },
-                                                  m_z { static_cast<int>(pow(n,k)) }
+        explicit UrnOR(uint n,uint k,uint check = 1):m_n { n },
+                                                     m_k { k },
+                                                     m_z { static_cast<uint>(pow(n,k)) }
         {   
-            if(m_n < 0 || m_k < 0)                                                    //Kommt neu dazu wegen uint --> int
-            {
-                throw std::domain_error("UrnOR with negative n or k is not valid.");
-            }
             if (check == 1 && m_n == 0 && m_k > 0)
             {
                 throw std::domain_error("UrnOR with n == 0 and k > 0 is not valid.");
@@ -251,17 +291,17 @@ class UrnOR
             
         }
 
-        int n() const
+        uint n() const
         {
             return m_n;
         }
 
-        int k() const
+        uint k() const
         {
             return m_k;
         }
 
-        int z() const
+        uint z() const
         {
             return m_z;
         }
@@ -290,7 +330,7 @@ class UrnOR
         {   
             if(m_k == draw.size())
             {
-                for(int posCount {}; posCount < m_k; ++posCount)
+                for(uint posCount {}; posCount < m_k; ++posCount)
                 {   
                     if(!(draw.at(posCount) <= (m_n-1)))
                     {   
@@ -306,12 +346,12 @@ class UrnOR
         {   
             if(valid(draw))
             {        
-                for (int downCount { m_k }; downCount > 0; --downCount)
+                for (uint downCount { m_k }; downCount > 0; --downCount)
                 {
                     if (draw[downCount - 1] < m_n - 1)
                     {   
                         ++draw[downCount - 1];
-                        for (int upCount { downCount }; upCount < m_k; ++upCount)
+                        for (uint upCount { downCount }; upCount < m_k; ++upCount)
                         {
                             draw[upCount] = 0;
                         }
@@ -326,7 +366,7 @@ class UrnOR
         {   
             if(valid(draw) && draw != Draw(m_k,0))
             {
-                for(int downCount {m_k}; downCount > 0; --downCount)
+                for(uint downCount {m_k}; downCount > 0; --downCount)
                 {
                     if(draw[downCount-1] != 0)
                     {
@@ -343,23 +383,17 @@ class UrnOR
             throw std::underflow_error("There is no valid back draw.");
         }
 
-        virtual Draw draw(int ordinalnumber) const
+        virtual Draw draw(uint ordinalnumber) const
         {   
             Draw draw(m_k, 0);
-            if (!(ordinalnumber < m_z) || ordinalnumber < 0)    //uint -> int
-            {
-                //throw std::overflow_error("There is no valid draw.");
-                throw std::out_of_range("There is no valid draw for this ordinalnumber."); //
-            }
-
             for (int posCount {static_cast<int>(m_k - 1)}; posCount >= 0; --posCount)
             {
-                for (int timesCount {m_n - 1}; timesCount >= 1; --timesCount)
+                for (uint timesCount {m_n - 1}; timesCount >= 1; --timesCount)
                 {
-                    if (static_cast<int>(pow(m_n, posCount)) * timesCount <= ordinalnumber)
+                    if (static_cast<uint>(pow(m_n, posCount)) * timesCount <= ordinalnumber)
                     {
                         draw[posCount] = timesCount;
-                        ordinalnumber -= static_cast<int>(pow(m_n, posCount)) * timesCount;
+                        ordinalnumber -= static_cast<uint>(pow(m_n, posCount)) * timesCount;
                         break;
                     }
                 }
@@ -381,7 +415,7 @@ class UrnOR
         virtual ~UrnOR() = default;
          
     protected:
-        const int m_n,
+        const uint m_n,
                   m_k,
                   m_z;
    };
@@ -390,7 +424,70 @@ int main()
 {   
     UrnOR urn {2,2};
     vector<int> v {1,2,3,4};
+    /*
+    int count = urn.end() - urn.begin();         //4
+    int vcount = v.end() - v.begin();            //4
+    cout << count << endl;                
+    cout << vcount << endl;
 
+    count = urn.rend() - urn.rbegin();     //4
+    vcount = v.rend() - v.rbegin();        //4
+    cout << count << endl;                
+    cout << vcount << endl;
+
+    count = urn.rbegin() - urn.rend();     //-4
+    vcount = v.rbegin() - v.rend();        //-4
+    cout << count << endl;                
+    cout << vcount << endl;
+
+
+    count = urn.begin() - urn.end();     //-4
+    vcount = v.begin() - v.end();        //-4
+    cout << count << endl;                
+    cout << vcount << endl;
+    */
+    
+    cout << "Problem bei:" << endl;
+    auto it {urn.begin()};
+    it -= 3;
+    int count = urn.end() - it;
+
+    auto itv {v.begin()};
+    itv -= 3;
+    int vcount = v.end() - itv;
+
+    cout << count << endl;                //5
+    cout << vcount << endl;                //7
+    
+    
+
+    /*
+    cout << to_string(*--it) << endl;
+    cout << it.ordinalnumber() << endl;
+    cout << it.status() << endl;
+    cout << to_string(*--it) << endl;
+    cout << it.ordinalnumber() << endl;
+    cout << it.status() << endl;
+    cout << to_string(*--it) << endl;
+    */
+    /*
+    cout << it.ordinalnumber() << endl;
+    cout << it.status() << endl;
+    cout << to_string(*++it) << endl;
+    cout << it.ordinalnumber() << endl;
+    cout << it.status() << endl;
+    cout << to_string(*++it) << endl;
+    cout << it.ordinalnumber() << endl;
+    cout << it.status() << endl;
+    cout << to_string(*++it) << endl;
+    cout << it.ordinalnumber() << endl;
+    cout << it.status() << endl;
+    cout << to_string(*++it) << endl;
+    */
+
+
+
+    /*
     auto it1 {urn.begin()};
     auto it2 {urn.end()};
 
