@@ -288,7 +288,11 @@ class UrnOR
         }
 
         uint z() const
-        {
+        {   
+            if(m_k == 0)
+            {
+                return 0; //vielleicht auch mit im Konstruktor verbieten?
+            }
             return m_z;
         }
 
@@ -405,7 +409,7 @@ class UrnOR
                    m_k,
                    m_z;
    };
-
+/*
 int main()
 {   
     UrnOR urn {2,2};
@@ -420,3 +424,4 @@ int main()
     
     return 0;
 }
+*/
