@@ -11,7 +11,7 @@ using namespace std;
 
 using uint = unsigned int; 
 using Draw = std::vector<uint>;
-
+/*
 template<class T> 
 concept R = std::ranges::range<T>;
 
@@ -26,7 +26,7 @@ concept BR = std::ranges::bidirectional_range<T>;
 
 template<class T>
 concept RR = std::ranges::random_access_range<T>;
-
+*/
 string to_string(const Draw& draw)
 {   
     string stdraw {};
@@ -39,6 +39,15 @@ string to_string(const Draw& draw)
         }
     }
     return stdraw;
+}
+
+int factorial(const int& n)
+{
+    if(n == 0)
+    {
+        return 1;
+    }
+    return n*factorial(n-1);
 }
 
 //UrnOR
@@ -267,8 +276,8 @@ class UrnOR
 
     public:
         explicit UrnOR(uint n,uint k,uint check = 1):m_n { n },
-                                                     m_k { k },
-                                                     m_z { static_cast<uint>(pow(n,k)) }
+                                                     m_k { k }
+                                                     /*m_z { static_cast<uint>(pow(n,k)) }*/
         {   
             if (check == 1 && m_n == 0 && m_k > 0)
             {
@@ -287,13 +296,13 @@ class UrnOR
             return m_k;
         }
 
-        uint z() const
+        virtual uint z() const
         {   
             if(m_k == 0)
             {
                 return 0; //vielleicht auch mit im Konstruktor verbieten?
             }
-            return m_z;
+            return static_cast<uint>(pow(m_n,m_k));
         }
 
         Iterator begin()
@@ -303,7 +312,7 @@ class UrnOR
 
         Iterator end()
         {
-            return Iterator(this,m_z,Iterator::Status::invalidBack);
+            return Iterator(this,z(),Iterator::Status::invalidBack);
         }
 
         auto rbegin()
@@ -406,22 +415,78 @@ class UrnOR
          
     protected:
         const uint m_n,
-                   m_k,
-                   m_z;
-   };
-/*
+                   m_k;
+                   //m_z;
+};
+
+//UrnO
+class UrnO: public virtual UrnOR
+{
+    public:
+        explicit UrnO(uint n,uint k,uint check = 2): UrnOR { n,k,check }
+        {   
+            if (check == 2 && m_k > m_n)
+            {
+                throw std::domain_error("UrnO with k > n is not valid.");
+            }
+        }
+
+        virtual uint z() const
+        {
+            return (factorial(m_n)/factorial(m_n-m_k));
+        }
+
+        //Funktioniert aber vielleicht noch verbesserung?
+        virtual Draw draw(uint ordinalnumber) const
+        {   
+            if(ordinalnumber >= z())
+            {
+                throw std::overflow_error("There is no valid next draw.");
+            }
+
+            Draw result {};
+            int repCount {-1};
+            for(uint upCount {}; upCount < UrnOR::z(); ++upCount)
+            {   
+                result = UrnOR::draw(upCount);
+                if(!repetitions(result))
+                {   
+                    ++repCount;
+                    if(repCount == ordinalnumber)
+                    {
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+
+        bool repetitions(const Draw& repDraw) const
+        {
+            for (uint outerCount {}; outerCount < m_k - 1; ++outerCount)
+            {
+                for (uint innerCount { outerCount + 1}; innerCount < m_k; ++innerCount)
+                {
+                    if (repDraw[outerCount] == repDraw[innerCount])
+                    {
+                        return true;
+                    }
+                }
+            }
+        return false;
+    }
+};
+
+
 int main()
 {   
-    UrnOR urn {2,2};
-    vector<int> v {1,2,3,4};
-
-    static_assert(R<UrnOR>);
-    static_assert(FR<UrnOR>);
-    static_assert(BR<UrnOR>);
-    static_assert(RR<UrnOR>);
-
-    cout << "Passed all concepts!" << endl;
-    
+    UrnO urn {3,3};
+    cout << to_string(urn.draw(0)) << endl;
+    cout << to_string(urn.draw(1)) << endl;
+    cout << to_string(urn.draw(2)) << endl;
+    cout << to_string(urn.draw(3)) << endl;
+    cout << to_string(urn.draw(4)) << endl;
+    cout << to_string(urn.draw(5)) << endl;
+    //cout << to_string(urn.draw(6)) << endl;
     return 0;
 }
-*/
