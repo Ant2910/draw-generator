@@ -452,7 +452,10 @@ int main()
     static_assert(BR<UrnOR>);
     static_assert(RR<UrnOR>);
 
-    cout << "Passed all concepts!" << endl;
+    cout << to_string(urn.draw(0)) << endl;
+    cout << to_string(urn.draw(1)) << endl;
+    cout << to_string(urn.draw(2)) << endl;
+    cout << to_string(urn.draw(3)) << endl;
 
     return 0;
 }

@@ -41,7 +41,7 @@ string to_string(const Draw& draw)
     return stdraw;
 }
 
-int factorial(const int& n)
+uint factorial(const uint& n)
 {
     if(n == 0)
     {
@@ -436,7 +436,8 @@ class UrnO: public virtual UrnOR
             return (factorial(m_n)/factorial(m_n-m_k));
         }
 
-        //Funktioniert aber vielleicht noch verbesserung?
+        //Funktioniert aber vielleicht noch Verbesserung?
+        /*
         virtual Draw draw(uint ordinalnumber) const
         {   
             if(ordinalnumber >= z())
@@ -460,6 +461,30 @@ class UrnO: public virtual UrnOR
             }
             return result;
         }
+        */
+
+        virtual Draw draw(uint ordinalnumber) const
+        {
+            Draw result;
+            Draw elements;
+            for(uint fillCount {}; fillCount < m_n; ++fillCount)
+            {
+                elements.push_back(fillCount);
+            }
+
+            uint currentVariations {z()};
+            uint index {};
+            for(uint upCount{}; upCount < m_k; ++upCount)
+            {
+                currentVariations /= (m_n-upCount);
+                index = ordinalnumber/currentVariations;
+                result.push_back(elements.at(index));
+                elements.erase(elements.begin()+index);
+                ordinalnumber -= index*currentVariations;
+            }
+            return result;
+        }
+
 
         bool repetitions(const Draw& repDraw) const
         {
@@ -473,20 +498,28 @@ class UrnO: public virtual UrnOR
                     }
                 }
             }
-        return false;
-    }
+            return false;
+        }
 };
 
 
 int main()
 {   
     UrnO urn {3,3};
+    UrnOR u {3,2};
+    
+    for(auto it {urn.begin()}; it != urn.end(); ++it)
+    {
+        cout << to_string(*it) << endl;
+    }
+    /*
     cout << to_string(urn.draw(0)) << endl;
     cout << to_string(urn.draw(1)) << endl;
     cout << to_string(urn.draw(2)) << endl;
     cout << to_string(urn.draw(3)) << endl;
     cout << to_string(urn.draw(4)) << endl;
     cout << to_string(urn.draw(5)) << endl;
+    */
     //cout << to_string(urn.draw(6)) << endl;
     return 0;
 }
