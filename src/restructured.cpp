@@ -296,7 +296,7 @@ class UrnOR
             return m_k;
         }
 
-        virtual uint z() const
+        virtual uint z() const 
         {   
             if(m_k == 0)
             {
@@ -384,6 +384,12 @@ class UrnOR
 
         virtual Draw draw(uint ordinalnumber) const
         {   
+            if(ordinalnumber < 0 || ordinalnumber >= UrnOR::z()) // UrnOR::z(), weil sonst in UrnR UrnR::z() verwendet wird
+            {
+                throw std::domain_error("There is no valid draw for this ordinalnumber.");
+            }
+            
+
             Draw draw(m_k, 0);
             for (int posCount {static_cast<int>(m_k - 1)}; posCount >= 0; --posCount)
             {
@@ -403,12 +409,12 @@ class UrnOR
 
         virtual Draw firstDraw() const
         {
-            return Draw(m_k,0);
+            return draw(0);
         }
 
         virtual Draw lastDraw() const
         {
-            return Draw(m_k,m_n-1);
+            return draw(z()-1);
         }
 
         virtual ~UrnOR() = default;
@@ -431,7 +437,7 @@ class UrnO: public virtual UrnOR
             }
         }
 
-        virtual uint z() const
+        virtual uint z() const override
         {
             return (factorial(m_n)/factorial(m_n-m_k));
         }
@@ -463,8 +469,13 @@ class UrnO: public virtual UrnOR
         }
         */
 
-        virtual Draw draw(uint ordinalnumber) const
-        {
+        virtual Draw draw(uint ordinalnumber) const override
+        {   
+            if(ordinalnumber < 0 || ordinalnumber >= z())
+            {
+                throw std::domain_error("There is no valid draw for this ordinalnumber.");
+            }
+
             Draw result;
             Draw elements;
             for(uint fillCount {}; fillCount < m_n; ++fillCount)
@@ -485,6 +496,35 @@ class UrnO: public virtual UrnOR
             return result;
         }
 
+        virtual Draw nextDraw(Draw draw) const override
+        {   
+            if(repetitions(draw) || draw == UrnO::draw(z()-1))
+            {
+                throw std::domain_error("Either the specified draw is incorrect or there is no next valid draw");
+            }
+
+            Draw result {draw};
+            do
+            {
+                result = UrnOR::nextDraw(result);
+            }while (repetitions(result));
+            return result;
+        }
+
+        virtual Draw backDraw(Draw draw) const override
+        {
+            if(repetitions(draw) || draw == UrnO::draw(0))
+            {
+                throw std::domain_error("Either the specified draw is incorrect or there is no next valid draw");
+            }
+
+            Draw result {draw};
+            do
+            {
+                result = UrnOR::backDraw(result);
+            }while (repetitions(result));
+            return result;
+        }
 
         bool repetitions(const Draw& repDraw) const
         {
@@ -499,27 +539,72 @@ class UrnO: public virtual UrnOR
                 }
             }
             return false;
+        }      
+};
+
+class UrnR: public virtual UrnOR
+{
+    public:
+        explicit UrnR(uint n,uint k,uint check = 3):UrnOR { n,k,check }
+        { 
+            if (check == 3 && m_n == 0)
+            {
+                throw std::domain_error("UrnR with n = 0 is not valid.");
+            }
+        }
+
+        virtual uint z() const override
+        {
+            return ((factorial(m_k+m_n-1))/(factorial(m_k)*factorial(m_n-1)));
+        }
+        
+        virtual Draw draw(uint ordinalnumber) const override
+        {   
+            if(ordinalnumber < 0 || ordinalnumber >= z())
+            {
+                throw std::domain_error("There is no valid draw for this ordinalnumber.");
+            }
+            
+            Draw result {};
+            int unsortedCount {-1};
+            for(uint upCount {}; upCount < UrnOR::z(); ++upCount)
+            {   
+                result = UrnOR::draw(upCount);
+                if(!unsorted(result))
+                {   
+                    ++unsortedCount;
+                    if(unsortedCount == ordinalnumber)
+                    {
+                        break;
+                    }
+                }
+            }
+            return result;
+
+        }
+        
+        bool unsorted(const Draw& unsortDraw) const
+        {
+            for (uint posCount {}; posCount < m_k - 1; ++posCount)
+            {
+                if (unsortDraw[posCount] > unsortDraw[posCount + 1])
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 };
 
 
 int main()
-{   
-    UrnO urn {3,3};
-    UrnOR u {3,2};
-    
-    for(auto it {urn.begin()}; it != urn.end(); ++it)
+{      
+    UrnR urn {2,2};
+
+    for(auto it{urn.begin()}; it != urn.end();++it)
     {
         cout << to_string(*it) << endl;
     }
-    /*
-    cout << to_string(urn.draw(0)) << endl;
-    cout << to_string(urn.draw(1)) << endl;
-    cout << to_string(urn.draw(2)) << endl;
-    cout << to_string(urn.draw(3)) << endl;
-    cout << to_string(urn.draw(4)) << endl;
-    cout << to_string(urn.draw(5)) << endl;
-    */
-    //cout << to_string(urn.draw(6)) << endl;
+    
     return 0;
 }
