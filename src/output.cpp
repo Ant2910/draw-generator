@@ -8,7 +8,7 @@ using namespace urn;
 
 int main()
 {
-    Urn u {4,3};
+    Urn u {3,3};
 
     do
     {
