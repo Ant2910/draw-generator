@@ -52,6 +52,14 @@ TEST_CASE("UrnOR")
         REQUIRE(to_string(u.backDraw({0,0,1})) == "0 0 0");
         REQUIRE(to_string(u.backDraw({1,1,2})) == "1 1 1");
         REQUIRE(to_string(u.draw(1)) == "0 0 1");
+        REQUIRE(to_string(u.draw(0)) == "0 0 0");
+        REQUIRE(to_string(u.draw(26)) == "2 2 2");
+
+        REQUIRE_THROWS_AS(u.draw(-1),std::domain_error);
+        REQUIRE_THROWS_WITH(u.draw(-1),"There is no valid draw for this ordinalnumber.");
+        REQUIRE_THROWS_AS(u.draw(27),std::domain_error);
+        REQUIRE_THROWS_WITH(u.draw(27),"There is no valid draw for this ordinalnumber.");
+
     }   
 
     SECTION("4")
@@ -145,6 +153,13 @@ TEST_CASE("UrnO")
         REQUIRE(to_string(u.backDraw({2,1,0})) == "2 0 1");
         REQUIRE(to_string(u.backDraw({1,0,2})) == "0 2 1");
         REQUIRE(to_string(u.draw(1)) == "0 2 1");
+        REQUIRE(to_string(u.draw(0)) == "0 1 2");
+        REQUIRE(to_string(u.draw(5)) == "2 1 0");
+
+        REQUIRE_THROWS_AS(u.draw(-1),std::domain_error);
+        REQUIRE_THROWS_WITH(u.draw(-1),"There is no valid draw for this ordinalnumber.");
+        REQUIRE_THROWS_AS(u.draw(6),std::domain_error);
+        REQUIRE_THROWS_WITH(u.draw(6),"There is no valid draw for this ordinalnumber.");
     }   
 
     SECTION("4")
@@ -247,6 +262,13 @@ TEST_CASE("UrnR")
         REQUIRE(to_string(u.backDraw({1,1,1})) == "0 2 2");
         REQUIRE(to_string(u.backDraw({0,2,2})) == "0 1 2");
         REQUIRE(to_string(u.draw(1)) == "0 0 1");
+        REQUIRE(to_string(u.draw(0)) == "0 0 0");
+        REQUIRE(to_string(u.draw(9)) == "2 2 2");
+
+        REQUIRE_THROWS_AS(u.draw(-1),std::domain_error);
+        REQUIRE_THROWS_WITH(u.draw(-1),"There is no valid draw for this ordinalnumber.");
+        REQUIRE_THROWS_AS(u.draw(10),std::domain_error);
+        REQUIRE_THROWS_WITH(u.draw(10),"There is no valid draw for this ordinalnumber.");
     }   
 
     SECTION("4")
@@ -320,65 +342,81 @@ TEST_CASE("UrnR")
 }
 
 
-/*
 //Urn
-
 TEST_CASE("Urn")
 {
     SECTION("1")
     {
-        Urn u {0,0};
-        REQUIRE(u.n() == 0);
-        REQUIRE(u.k() == 0);
-        REQUIRE(u.z() == 0);
+        Urn u {5,3};
+        REQUIRE(u.n() == 5);
+        REQUIRE(u.k() == 3);
+        REQUIRE(u.z() == 10);
     }
 
     SECTION("2")
     {
-        Urn u {3,2};
+        Urn u {3,3};
         REQUIRE(u.n() == 3);
-        REQUIRE(u.k() == 2);
-        REQUIRE(u.z() == 3);
+        REQUIRE(u.k() == 3);
+        REQUIRE(u.z() == 1);
     }
-//Hier weiter
+
     SECTION("3")
     {
-        UrnO u {3,3};
-        REQUIRE(to_string(u.firstDraw()) == "0 1 2");
-        REQUIRE(to_string(u.lastDraw()) == "2 1 0");
-        REQUIRE(to_string(u.nextDraw({0,1,2})) == "0 2 1");
-        REQUIRE(to_string(u.nextDraw({2,0,1})) == "2 1 0");
-        REQUIRE(to_string(u.backDraw({2,1,0})) == "2 0 1");
-        REQUIRE(to_string(u.backDraw({1,0,2})) == "0 2 1");
-        REQUIRE(to_string(u.draw(1)) == "0 2 1");
+        Urn u {4,2};
+        REQUIRE(to_string(u.firstDraw()) == "0 1");
+        REQUIRE(to_string(u.lastDraw()) == "2 3");
+        REQUIRE(to_string(u.nextDraw({0,2})) == "0 3");
+        REQUIRE(to_string(u.nextDraw({0,3})) == "1 2");
+        REQUIRE(to_string(u.backDraw({1,2})) == "0 3");
+        REQUIRE(to_string(u.backDraw({0,3})) == "0 2");
+        REQUIRE(to_string(u.draw(1)) == "0 2");
+        REQUIRE(to_string(u.draw(0)) == "0 1");
+        REQUIRE(to_string(u.draw(5)) == "2 3");
+
+        REQUIRE_THROWS_AS(u.draw(-1),std::domain_error);
+        REQUIRE_THROWS_WITH(u.draw(-1),"There is no valid draw for this ordinalnumber.");
+        REQUIRE_THROWS_AS(u.draw(6),std::domain_error);
+        REQUIRE_THROWS_WITH(u.draw(6),"There is no valid draw for this ordinalnumber.");
     }   
 
     SECTION("4")
     {   
-        UrnO u {3,3};
-        REQUIRE_THROWS_AS((UrnO { 2,3 }),std::domain_error);
-        REQUIRE_THROWS_WITH((UrnO { 2,4 }),"UrnO with k > n is not valid.");
+        Urn u {3,2};
+        //Test for constructor
+        REQUIRE_THROWS_AS((Urn { 0,3 }),std::domain_error);
+        REQUIRE_THROWS_WITH((Urn { 0,3 }),"UrnOR with n == 0 and k > 0 is not valid.");
 
-        REQUIRE_THROWS_AS((u.nextDraw({2,1,0})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.nextDraw({2,1,0})),"Either the specified draw is incorrect or there is no next valid draw");
+        //Test for range
+        REQUIRE_THROWS_AS((u.nextDraw({1,2})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.nextDraw({1,2})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.nextDraw({0,0,1})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.nextDraw({0,0,1})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.backDraw({0,1})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.backDraw({0,1})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({0,1,2})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({0,1,2})),"Either the specified draw is incorrect or there is no next valid draw");
+        //Test for unsorted
+        REQUIRE_THROWS_AS((u.nextDraw({1,0})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.nextDraw({1,0})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({0,1,1})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({0,1,1})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.backDraw({2,0})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.backDraw({2,0})),"Either the specified draw is incorrect or there is no next valid draw");
+
+        //Test for repetitions
+        REQUIRE_THROWS_AS((u.nextDraw({0,0})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.nextDraw({0,0})),"Either the specified draw is incorrect or there is no next valid draw");
+
+        REQUIRE_THROWS_AS((u.backDraw({1,1})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.backDraw({1,1})),"Either the specified draw is incorrect or there is no next valid draw");
+    
     }
 
     //Urn Iterator Test
     SECTION("5")
     {   
-        UrnO u {3,2};
-        REQUIRE(RandomAccessRange<UrnO>);
-        REQUIRE((iterateRange(u.begin(), u.end())) == "0 10 21 01 22 02 1");
-        REQUIRE((iterateRange(u.rbegin(), u.rend())) == "2 12 01 21 00 20 1");
+        Urn u {3,2};
+        REQUIRE(RandomAccessRange<Urn>);
+        REQUIRE((iterateRange(u.begin(), u.end())) == "0 10 21 2");
+        REQUIRE((iterateRange(u.rbegin(), u.rend())) == "1 20 20 1");
 
         auto itBegin {u.begin()};
         auto itEnd {u.end()};
@@ -400,13 +438,13 @@ TEST_CASE("Urn")
         REQUIRE((itRbegin >= itRend) == false);
         REQUIRE((itRbegin <= itRend) == true);
 
-        REQUIRE(u.end()-u.begin() == 6);
-        REQUIRE(u.rend()-u.rbegin() == 6);
+        REQUIRE(u.end()-u.begin() == 3);
+        REQUIRE(u.rend()-u.rbegin() == 3);
 
         ++itBegin;
         REQUIRE(to_string(*itBegin) == "0 2");
         itBegin++;
-        REQUIRE(to_string(*itBegin) == "1 0");
+        REQUIRE(to_string(*itBegin) == "1 2");
         --itBegin;
         REQUIRE(to_string(*itBegin) == "0 2");
         itBegin--;
@@ -414,9 +452,8 @@ TEST_CASE("Urn")
 
         auto it {u.begin()};
         it += 2;
-        REQUIRE(to_string(*it) == "1 0");
+        REQUIRE(to_string(*it) == "1 2");
         it -= 1;
         REQUIRE(to_string(*it) == "0 2");
     }
 }
-*/

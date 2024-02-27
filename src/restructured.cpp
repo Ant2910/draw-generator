@@ -693,7 +693,7 @@ class Urn: public UrnO, public UrnR
 
         virtual Draw backDraw(Draw draw) const override
         {
-            if(repetitions(draw) || draw == Urn::draw(0))
+            if(repetitions(draw) || unsorted(draw) || draw == Urn::draw(0))
             {
                 throw std::domain_error("Either the specified draw is incorrect or there is no next valid draw");
             }
@@ -707,15 +707,82 @@ class Urn: public UrnO, public UrnR
         }
 };
 
+//Generic Urn
+
+template<bool O, bool R>
+struct UrnSelector
+{
+    using UrnType = UrnOR;
+};
+
+template<>
+struct UrnSelector<true, false>
+{
+    using UrnType = UrnO;
+};
+
+template <>
+struct UrnSelector<false, true>
+{
+    using UrnType = UrnR;
+};
+
+template <>
+struct UrnSelector<false, false> 
+{
+    using UrnType = Urn;
+};
+
+template<typename T, bool ORDER = true, bool REPETITION = true>
+class GenericUrn
+{   
+    public:
+        GenericUrn(uint k, const std::vector<T>& elements):m_urn {static_cast<uint>(elements.size()),k}, 
+                                                           m_elements {elements}{}
+        uint n() const 
+        {
+            return m_urn.n();
+        }
+
+        uint k() const 
+        {
+            return m_urn.k();
+        }
+
+        uint z() const
+        {
+            return m_urn.z();
+        }
+
+        Draw draw(uint ordinalnumber) const
+        {
+            return m_urn.draw(ordinalnumber);
+        }
+
+        Draw nextDraw(Draw draw) const
+        {
+            return m_urn.nextDraw(draw);
+        }
+
+        Draw backDraw(Draw draw) const
+        {
+            return m_urn.backDraw(draw);
+        }
+    
+    private:
+        using UrnType = typename UrnSelector<ORDER,REPETITION>::UrnType;
+        UrnType m_urn;
+        std::vector<T> m_elements;
+};
+
 /*
 int main()
 {      
-    UrnO urn {1,0};
+    GenericUrn<string,false,false> u {3, {"A","B","C"}};
 
-    for(auto it = urn.begin(); it != urn.end(); ++it)
-    {
-        cout << to_string(*it) << endl;
-    }
+    cout << to_string(u.draw(0)) << endl;
+    cout << to_string(u.draw(1)) << endl;
+    cout << to_string(u.draw(2)) << endl;
 
     return 0;
 }
