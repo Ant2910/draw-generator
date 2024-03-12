@@ -27,6 +27,7 @@ concept BR = std::ranges::bidirectional_range<T>;
 template<class T>
 concept RR = std::ranges::random_access_range<T>;
 */
+/*
 string to_string(const Draw& draw)
 {   
     string stdraw {};
@@ -40,6 +41,29 @@ string to_string(const Draw& draw)
     }
     return stdraw;
 }
+*/
+
+//Nötig für die template function, da es keine standart to_string(string draw) gibt
+string to_string(string draw)
+{
+    return draw;
+}
+
+template<class T>
+string to_string(const vector<T>& draw)
+{
+    string stdraw {};
+    for(uint posCount{}; posCount < draw.size(); ++posCount)
+    {
+        stdraw += to_string(draw.at(posCount));
+        if(posCount != (draw.size()-1))
+        {
+            stdraw += " ";
+        }
+    }
+    return stdraw;
+} 
+
 
 uint factorial(const uint& n)
 {
@@ -734,8 +758,232 @@ struct UrnSelector<false, false>
 };
 
 template<typename T, bool ORDER = true, bool REPETITION = true>
-class GenericUrn
+class GenericUrn    //Keine Vererbung von UrnOR, da sonst draw, firstDraw, lastDraw, ... override anschlägt
 {   
+    public:
+    class Iterator
+    {   
+        public:
+            using iterator_category = std::random_access_iterator_tag;  //std::bidirectional_iterator_tag;
+            using difference_type   = std::ptrdiff_t;
+            using value_type        = vector<T>; //vector<unsigned int>
+            using pointer           = vector<T>*;  
+            using reference         = const vector<T>; //Kommentar anmerken
+            using size_type         = std::size_t;  //https://en.cppreference.com/w/cpp/types/size_t
+
+            //Iterators: constructible, copy-constructible, copy-assignable, destructible and swappable
+            enum class Status
+            {
+                invalidFront,
+                valid,
+                invalidBack
+            };
+            
+            Iterator(const GenericUrn<T,ORDER,REPETITION>* urn, const uint& ordinalnumber, const Status& status): m_itUrn{ urn },
+                                                                                         m_ordinalnumber{ static_cast<int>(ordinalnumber) },
+                                                                                         m_status { status }{}
+
+            Iterator() = default;   //Für ranges::random_access_iterator
+
+            string status() const
+            {
+                switch(m_status)
+                {
+                    case Status::invalidFront: return "invalidFront"; break;
+                    case Status::valid: return "valid"; break;
+                    case Status::invalidBack: return "invalidBack"; break;
+                    default: throw std::invalid_argument("m_status is invalid."); break;
+                }
+            }
+
+            uint n() const
+            {
+                return (*m_itUrn).n();
+            }
+
+            uint k() const
+            {
+                return (*m_itUrn).k();
+            }
+
+            uint z() const
+            {
+                return (*m_itUrn).z();
+            }
+
+            int ordinalnumber() const
+            {
+                return m_ordinalnumber;
+            }
+            
+            const value_type operator*() const 
+            {   
+                if(m_ordinalnumber >= z() || m_ordinalnumber < 0)
+                {   
+                    throw std::domain_error("There is no valid draw for this ordinalnumber.");
+                    //Sollte eigentlich einen vector mit 0 0 0 bzw. ähnlichen Werten
+                    //zurückgeben allerdings bei vector<T> sehr umständlich
+                    //return Draw((k()), 0);
+                }
+                return (*m_itUrn).draw(m_ordinalnumber);
+            }
+            
+            Iterator& operator++()
+            {   
+                ++m_ordinalnumber;
+                
+                if(m_ordinalnumber == 0)
+                {  
+                    m_status = Status::valid;
+                }
+                else if(m_ordinalnumber < 0)
+                {
+                    m_status = Status::invalidFront;
+                }
+                else if(m_ordinalnumber >= z())
+                {
+                    m_status = Status::invalidBack;
+                }
+                
+                return *this;
+            }
+                
+            Iterator operator++(int)
+            { 
+                auto temp {*this};
+                ++(*this);
+                return temp;
+            }
+            
+            Iterator& operator--()
+            {   
+                --m_ordinalnumber;
+                if(m_ordinalnumber == z()-1)
+                {  
+                    m_status = Status::valid;
+                }
+                else if(m_ordinalnumber < 0)
+                {
+                    m_status = Status::invalidFront;
+                }
+                else if(m_ordinalnumber >= z())
+                {
+                    m_status = Status::invalidBack;
+                }
+                return *this;
+            }
+            
+            Iterator operator--(int)
+            {
+                auto temp {*this};
+                --(*this);
+                return temp;
+            }
+            
+            bool operator== (const Iterator& other) const
+            { 
+                return (m_ordinalnumber == other.m_ordinalnumber);
+            }   
+
+            bool operator!= (const Iterator& other) const
+            {  
+                return !(*this == other); 
+            }
+
+            bool operator< (const Iterator& other) const
+            { 
+                return (m_ordinalnumber < other.m_ordinalnumber);
+            }
+
+            bool operator> (const Iterator& other) const 
+            { 
+                return (m_ordinalnumber > other.m_ordinalnumber);
+            }
+
+            bool operator<=(const Iterator& other) const
+            { 
+                return (*this == other || *this < other);
+            }
+
+            bool operator>=(const Iterator& other) const
+            { 
+                return (*this == other || *this > other);
+            }
+            /*
+            //Addition mit += (bei allen additionen und subtraktionen Klammerausdrücke testen in catch2)
+            Iterator& operator+=(const difference_type& other)
+            {   
+                if(other >= 0)
+                {
+                    for(uint incCount{}; incCount < other; ++incCount)
+                    {
+                        ++(*this);
+                    }
+                }
+                else if(other < 0)
+                {   
+                    long int positivOther {other * -1};
+                    for(uint decCount{}; decCount < positivOther; ++decCount)
+                    {
+                        --(*this);
+                    }
+                }
+                return *this;
+            }
+
+            //Addition mit +
+            Iterator operator+(const difference_type& n) const //ist besser ohne const
+            { 
+                auto temp {*this};
+                return (temp += n);
+            }
+            
+            friend Iterator operator+(const difference_type& n, const Iterator& other) 
+            {
+                return other + n;
+            }
+            
+            //Subtraktion mit -=
+            Iterator& operator-=(const difference_type& n)
+            {
+                long int negativ {n * -1};
+                (*this) += negativ;
+                return *this;
+            }
+
+            //Subtraktion mit -
+            Iterator operator-(const difference_type& n) const
+            { 
+                auto temp {*this};
+                return (temp -= n);
+            }
+
+            //Difference
+            difference_type operator-(const Iterator& other) const
+            { 
+                return m_ordinalnumber - other.m_ordinalnumber;
+            }
+
+            //Index
+            //it[0] = {2,2}; ist nicht möglich da reference = const Draw und so kann der Wert nicht verändert werden
+            //Sollte aber kein Problem sein, da es für die Urn nicht möglich sein sollte
+            reference operator[](size_type index) const 
+            { 
+                if(index >= z() || index < 0)
+                {
+                    return Draw((k()), 0);
+                }
+                return (*m_urn).draw(index);
+            }
+            */
+            ~Iterator() = default;
+
+        protected:
+            const GenericUrn<T,ORDER,REPETITION>* m_itUrn;
+            int m_ordinalnumber;
+            Status m_status;
+    };
+
     public:
         GenericUrn(uint k, const std::vector<T>& elements):m_urn {static_cast<uint>(elements.size()),k}, 
                                                            m_elements {elements}{}
@@ -754,36 +1002,116 @@ class GenericUrn
             return m_urn.z();
         }
 
-        Draw draw(uint ordinalnumber) const
+        Iterator begin()
         {
-            return m_urn.draw(ordinalnumber);
+            return Iterator(this,0,Iterator::Status::valid);
         }
 
-        Draw nextDraw(Draw draw) const
+        Iterator end()
         {
-            return m_urn.nextDraw(draw);
+            return Iterator(this,z(),Iterator::Status::invalidBack);
         }
 
-        Draw backDraw(Draw draw) const
-        {
-            return m_urn.backDraw(draw);
+        auto rbegin()
+        {   
+            return make_reverse_iterator(end());
         }
-    
+
+        auto rend()
+        {
+           return make_reverse_iterator(begin());
+        }
+        
+        vector<T> to_element(const Draw& draw) const
+        {
+            vector<T> result{};
+            for(auto i: draw)
+            {
+                result.push_back(m_elements.at(i));
+            }
+            return result;
+        }
+
+        auto draw(uint ordinalnumber) const
+        {
+            return to_element(m_urn.draw(ordinalnumber));
+        }
+        
+        /*
+        //Konvertiert den uint Draw direkt zu den m_elements
+        vector<T> draw(uint ordinalnumber)
+        {
+            vector<T> result {};
+            Draw draw {m_urn.draw(ordinalnumber)};
+            for(auto i: draw)
+            {
+                result.push_back(m_elements.at(i));
+            }
+            return result;
+        }
+        */
+        auto nextDraw(const vector<T>& draw) const
+        {   
+            Draw nextDraw {};
+            for(uint posCount {}; posCount < draw.size(); ++posCount)
+            {
+                for(uint upCount {}; upCount < m_elements.size(); ++upCount)
+                {
+                    if(draw.at(posCount) == m_elements.at(upCount))
+                    {
+                        nextDraw.push_back(upCount);
+                    }
+                }
+            }
+            return to_element(m_urn.nextDraw(nextDraw));
+        }
+
+        auto backDraw(const vector<T>& draw) const
+        {
+            Draw backDraw {};
+            for(uint posCount {}; posCount < draw.size(); ++posCount)
+            {
+                for(uint upCount {}; upCount < m_elements.size(); ++upCount)
+                {
+                    if(draw.at(posCount) == m_elements.at(upCount))
+                    {
+                        backDraw.push_back(upCount);
+                    }
+                }
+            }
+            return to_element(m_urn.backDraw(backDraw));
+        }
+
+        auto firstDraw()
+        {
+            return to_element(m_urn.firstDraw());
+        }
+
+        auto lastDraw()
+        {
+            return to_element(m_urn.lastDraw());
+        }
+
     private:
         using UrnType = typename UrnSelector<ORDER,REPETITION>::UrnType;
         UrnType m_urn;
         std::vector<T> m_elements;
 };
 
-/*
+
 int main()
-{      
-    GenericUrn<string,false,false> u {3, {"A","B","C"}};
+{   
+    
+    GenericUrn<string,true,true> u {3, {"A","B","C"}};
 
-    cout << to_string(u.draw(0)) << endl;
-    cout << to_string(u.draw(1)) << endl;
-    cout << to_string(u.draw(2)) << endl;
-
+    auto it {u.begin()};
+    cout << it.n() << " " << it.k() << " " << it.z() << endl;
+    *it;
+    
+    for(auto itA {u.end()}; itA != u.begin(); --itA)
+    {
+        cout << to_string(*itA) << endl;
+    }
+    
     return 0;
 }
-*/
