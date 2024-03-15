@@ -821,9 +821,8 @@ class GenericUrn    //Keine Vererbung von UrnOR, da sonst draw, firstDraw, lastD
                 if(m_ordinalnumber >= z() || m_ordinalnumber < 0)
                 {   
                     throw std::domain_error("There is no valid draw for this ordinalnumber.");
-                    //Sollte eigentlich einen vector mit 0 0 0 bzw. ähnlichen Werten
-                    //zurückgeben allerdings bei vector<T> sehr umständlich
-                    //return Draw((k()), 0);
+                    //Gibt beim std::vector --it Loop von end zu begin einen Segmantion fault
+                    //bei string also ist es so okay (vielleicht noch eine Überladung für int, float, ...
                 }
                 return (*m_itUrn).draw(m_ordinalnumber);
             }
@@ -909,7 +908,7 @@ class GenericUrn    //Keine Vererbung von UrnOR, da sonst draw, firstDraw, lastD
             { 
                 return (*this == other || *this > other);
             }
-            /*
+            
             //Addition mit += (bei allen additionen und subtraktionen Klammerausdrücke testen in catch2)
             Iterator& operator+=(const difference_type& other)
             {   
@@ -963,19 +962,20 @@ class GenericUrn    //Keine Vererbung von UrnOR, da sonst draw, firstDraw, lastD
             { 
                 return m_ordinalnumber - other.m_ordinalnumber;
             }
-
+            
             //Index
             //it[0] = {2,2}; ist nicht möglich da reference = const Draw und so kann der Wert nicht verändert werden
             //Sollte aber kein Problem sein, da es für die Urn nicht möglich sein sollte
             reference operator[](size_type index) const 
             { 
                 if(index >= z() || index < 0)
-                {
-                    return Draw((k()), 0);
+                {   
+                    throw std::domain_error("There is no valid draw for this ordinalnumber.");
+                    //Gleiches Problem wie bei 
                 }
-                return (*m_urn).draw(index);
+                return (*m_itUrn).draw(index);
             }
-            */
+            
             ~Iterator() = default;
 
         protected:
@@ -1104,14 +1104,9 @@ int main()
     
     GenericUrn<string,true,true> u {3, {"A","B","C"}};
 
-    auto it {u.begin()};
-    cout << it.n() << " " << it.k() << " " << it.z() << endl;
-    *it;
-    
-    for(auto itA {u.end()}; itA != u.begin(); --itA)
-    {
-        cout << to_string(*itA) << endl;
-    }
-    
+    auto it = u.begin();
+
+    cout << to_string(it[26]) << endl;
+
     return 0;
 }
