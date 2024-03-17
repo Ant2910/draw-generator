@@ -42,9 +42,22 @@ string to_string(const Draw& draw)
     return stdraw;
 }
 */
+/*
+template<typename T>
+T to_string(T draw)
+{
+    return draw;
+}
+*/
 
 //Nötig für die template function, da es keine standart to_string(string draw) gibt
 string to_string(string draw)
+{
+    return draw;
+}
+
+//Nötig für die template function, da es keine standart to_string(string draw) gibt
+char to_string(char draw)
 {
     return draw;
 }
@@ -757,7 +770,7 @@ struct UrnSelector<false, false>
     using UrnType = Urn;
 };
 
-template<typename T, bool ORDER = true, bool REPETITION = true>
+template<class T, bool ORDER = true, bool REPETITION = true>
 class GenericUrn    //Keine Vererbung von UrnOR, da sonst draw, firstDraw, lastDraw, ... override anschlägt
 {   
     public:
@@ -971,7 +984,7 @@ class GenericUrn    //Keine Vererbung von UrnOR, da sonst draw, firstDraw, lastD
                 if(index >= z() || index < 0)
                 {   
                     throw std::domain_error("There is no valid draw for this ordinalnumber.");
-                    //Gleiches Problem wie bei 
+                    //Gleiches Problem wie bei operator *()
                 }
                 return (*m_itUrn).draw(index);
             }
@@ -1050,6 +1063,7 @@ class GenericUrn    //Keine Vererbung von UrnOR, da sonst draw, firstDraw, lastD
             return result;
         }
         */
+
         auto nextDraw(const vector<T>& draw) const
         {   
             Draw nextDraw {};
@@ -1097,16 +1111,57 @@ class GenericUrn    //Keine Vererbung von UrnOR, da sonst draw, firstDraw, lastD
         UrnType m_urn;
         std::vector<T> m_elements;
 };
+/*
+class Person
+        {
+            public:
+                Person(string name, uint age): m_name {name}, m_age{age}{}
 
+                string getName()
+                {
+                    return m_name;
+                }
+
+                uint getAge()
+                {
+                    return m_age;
+                }
+
+                bool operator==(const Person& other) const
+                {
+                    return (m_name == other.m_name && m_age == other.m_age);
+                }
+
+            private:
+                string m_name {};
+                uint m_age {};  
+        };
+
+        string outputPerson(vector<Person> draw)
+        {   
+            string stdraw {};
+            for(uint posCount{}; posCount < draw.size(); ++posCount)
+            {
+                stdraw += (draw.at(posCount).getName()) + "," + to_string((draw.at(posCount).getAge()));
+                if(posCount != (draw.size()-1))
+                {
+                    stdraw += " ";
+                }
+            }
+            return stdraw;
+        }
 
 int main()
 {   
     
-    GenericUrn<string,true,true> u {3, {"A","B","C"}};
+    GenericUrn<string,true,true> u {2,{"A","B"}};
 
-    auto it = u.begin();
+    GenericUrn<Person,true,true> ur {2,{{"Theo",12},{"Jonas",13}}};
 
-    cout << to_string(it[26]) << endl;
+    auto it {ur.begin()};
+
+    cout << outputPerson(it[29]) << endl;
 
     return 0;
 }
+*/
