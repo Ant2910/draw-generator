@@ -1,6 +1,6 @@
 /*! 
  * \file urn.cpp
- * \author Anton Hemple, Ulrich Eisenecker
+ * \author Anton Hempel, Ulrich Eisenecker
  * \date March 18, 2024
  *  
  * Implementation file of the draw generator
@@ -560,5 +560,74 @@ namespace urn
             }
         }
         return false;
+    }
+
+    //Urn – urn with unimportant order and without repetitions.
+
+    Urn::Urn(uint n,uint k,uint check):UrnOR { n,k },
+                                       UrnO { n,k,1 },
+                                       UrnR { n,k,1 }{}
+
+    uint Urn::z() const
+    {   
+        if(m_k == 0)
+        {
+            return 0;
+        }
+        return ((factorial(m_n))/(factorial(m_n-m_k)*factorial(m_k)));
+    }
+
+    Draw Urn::draw(uint ordinalnumber) const
+    {
+        if(ordinalnumber < 0 || ordinalnumber >= z())
+        {
+            throw std::domain_error("There is no valid draw for this ordinalnumber.");
+        }
+            
+        Draw result {};
+        int drawCount {-1};
+        for(uint upCount {}; upCount < UrnOR::z(); ++upCount)
+        {   
+            result = UrnOR::draw(upCount);
+            if(!unsorted(result) && !repetitions(result))
+            {   
+                ++drawCount;
+                if(drawCount == ordinalnumber)
+                {
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    Draw Urn::nextDraw(Draw draw) const
+    {   
+        if(repetitions(draw) || unsorted(draw) || draw == Urn::draw(z()-1))
+        {
+            throw std::domain_error("Either the specified draw is incorrect or there is no next valid draw");
+        }
+
+        Draw result {draw};
+        do
+        {
+            result = UrnOR::nextDraw(result);
+        }while (repetitions(result) || unsorted(result));
+        return result;
+    }
+
+    Draw Urn::backDraw(Draw draw) const
+    {
+        if(repetitions(draw) || unsorted(draw) || draw == Urn::draw(0))
+        {
+            throw std::domain_error("Either the specified draw is incorrect or there is no next valid draw");
+        }
+
+        Draw result {draw};
+        do
+        {
+            result = UrnOR::backDraw(result);
+        }while (repetitions(result) || unsorted(result));
+        return result;
     }
 }

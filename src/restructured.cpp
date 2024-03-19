@@ -1049,20 +1049,6 @@ class GenericUrn    //Keine Vererbung von UrnOR, da sonst draw, firstDraw, lastD
         {
             return to_element(m_urn.draw(ordinalnumber));
         }
-        
-        /*
-        //Konvertiert den uint Draw direkt zu den m_elements
-        vector<T> draw(uint ordinalnumber)
-        {
-            vector<T> result {};
-            Draw draw {m_urn.draw(ordinalnumber)};
-            for(auto i: draw)
-            {
-                result.push_back(m_elements.at(i));
-            }
-            return result;
-        }
-        */
 
         auto nextDraw(const vector<T>& draw) const
         {   

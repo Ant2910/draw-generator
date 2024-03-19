@@ -3,6 +3,11 @@
 using namespace urn;
 using namespace std;
 
+string to_string(string s)
+{
+    return s;
+}
+
 string to_string(const Draw& draw)
 {   
     string stdraw {};
@@ -19,11 +24,12 @@ string to_string(const Draw& draw)
 
 int main()
 {
-    UrnR u {3,3};
-    
+    GenericUrn<std::string,true,true> u {3,{"A","B","C"}};
+    /*
     for(auto it {u.begin()}; it != u.end(); ++it)
     {
         cout << to_string(*it) << endl;
     }
-    
+    */
+    return 0;
 }

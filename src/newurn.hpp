@@ -1,6 +1,6 @@
 /*! 
  * \file urn.hpp
- * \author Anton Hemple, Ulrich Eisenecker
+ * \author Anton Hempel, Ulrich Eisenecker
  * \date March 18, 2024
  *  
  * Header file of the draw generator
@@ -31,11 +31,6 @@
 #include <cmath>
 #include <algorithm>
 #include <iterator>
-
-namespace std
-{
-    std::string to_string(std::string ball);
-}
 
 /*! 
  * \namespace urn
@@ -463,6 +458,185 @@ namespace urn
              */
             bool unsorted(const Draw& unsortDraw) const;
     };
-}
 
+    /*!
+     * \class Urn – urn with unimportant order and without repetitions.
+     */
+
+    class Urn: public UrnO, public UrnR
+    {
+        public:
+            /*!
+             * \brief Constructor for Urn.
+             * Constructs an exampler of Urn.
+             * Declared as explicit to prevent implicit calls.
+             * Constructor calls the constructors of 
+             * UrnOR { n,k }, UrnO { n,k,1 } and UrnR { n,k,1 }
+             * The constructor body does not perform any check. The checks are performed by the UrnOR constructor.
+             * 
+             * @param[in] n      The number of balls inside the urn.
+             * @param[in] k      The size of a draw from the urn.
+             */
+            explicit Urn(uint n,uint k,uint check = 3);
+
+            /*!
+             * \brief Getter method which returns z.
+             * \return z the number of all possible draws.
+             */
+            virtual uint z() const override;
+
+            /*!
+             * \brief Calculates the corresponding draw from a given ordinal number.
+             * \return Draw of type Draw.
+             */
+            virtual Draw draw(uint ordinalnumber) const override;
+
+            /*!
+             * \brief Specifies the subsequent draw for the specified draw, if it exists.
+             * \return Next draw of type Draw.
+             */
+            virtual Draw nextDraw(Draw draw) const override;
+
+            /*!
+             * \brief Specifies the previous draw for the specified draw, if it exists.
+             * \return Previous draw of type Draw.
+             */
+            virtual Draw backDraw(Draw draw) const override;
+    };
+
+    /*!
+     * \struct UrnSelector is used to set the UrnType in the template class GenericUrn.
+     * The standard UrnType is UrnOR.
+     * 
+     * Note for the compilation of the program. 
+     * Since C++14 an explicit specialization within a class/class template is possible. 
+     * Unfortunately it seems that the G++ compiler (GNU c++ compiler) does not support this feature yet.
+     * 
+     * @tparam O     Is order important?
+     * @tparam R     Is repetition important?        
+     */
+    template <bool O, bool R>
+    struct UrnSelector;
+
+    /*!
+     * \struct UrnSelector specialization for order important and repetition not important.
+     * The UrnType is UrnO.      
+     */
+    template <>
+    struct UrnSelector<true, false>;
+
+    /*!
+     * \struct UrnSelector specialization for order not important and repetition important.
+     * The UrnType is UrnR.      
+     */
+    template <>
+    struct UrnSelector<false, true>;
+
+    /*!
+     * \struct UrnSelector specialization for order not important and repetition not important.
+     * The UrnType is Urn.      
+     */
+    template <>
+    struct UrnSelector<false, false>;
+
+    using namespace std;
+
+    /*!
+     * \class GenericUrn - Template-Wrapper for the urn models/draw-generator.
+     * 
+     * @tparam T            Type for which the GenericUrn is to be created.
+     * @tparam ORDER        Is order important?
+     * @tparam REPETITION   Is repetition important?      
+     */
+    template<class T, bool ORDER = true, bool REPETITION = true>
+    class GenericUrn   
+    {   
+        public:
+    class Iterator;
+    
+    GenericUrn(uint k, const std::vector<T>& elements);
+
+    uint n() const;
+    uint k() const;
+    uint z() const;
+
+    Iterator begin();
+    Iterator end();
+    auto rbegin();
+    auto rend();
+
+    vector<T> to_element(const Draw& draw) const;
+    auto draw(uint ordinalnumber) const;
+    auto nextDraw(const vector<T>& draw) const;
+    auto backDraw(const vector<T>& draw) const;
+    auto firstDraw();
+    auto lastDraw();
+
+private:
+    using UrnType = typename UrnSelector<ORDER,REPETITION>::UrnType;
+    UrnType m_urn;
+    std::vector<T> m_elements;
+};
+
+template<class T, bool ORDER, bool REPETITION>
+class GenericUrn<T, ORDER, REPETITION>::Iterator {
+public:
+    using iterator_category = std::random_access_iterator_tag;
+    using difference_type   = std::ptrdiff_t;
+    using value_type        = std::vector<T>;
+    using pointer           = std::vector<T>*;
+    using reference         = const std::vector<T>;
+    using size_type         = std::size_t;
+
+    enum class Status {
+        invalidFront,
+        valid,
+        invalidBack
+    };
+
+    Iterator(const GenericUrn<T, ORDER, REPETITION>* urn, const uint& ordinalnumber, const Status& status);
+
+    string status() const;
+    uint n() const;
+    uint k() const;
+    uint z() const;
+    int ordinalnumber() const;
+    
+    const value_type operator*() const;
+    
+    Iterator& operator++();
+    Iterator operator++(int);
+    Iterator& operator--();
+    Iterator operator--(int);
+    
+    bool operator== (const Iterator& other) const;
+    bool operator!= (const Iterator& other) const;
+    bool operator< (const Iterator& other) const;
+    bool operator> (const Iterator& other) const;
+    bool operator<=(const Iterator& other) const;
+    bool operator>=(const Iterator& other) const;
+    
+    Iterator& operator+=(const difference_type& other);
+    Iterator operator+(const difference_type& n) const;
+    friend Iterator operator+(const difference_type& n, const Iterator& other);
+    Iterator& operator-=(const difference_type& n);
+    Iterator operator-(const difference_type& n) const;
+    difference_type operator-(const Iterator& other) const;
+    reference operator[](size_type index) const;
+    ~Iterator();
+
+protected:
+    const GenericUrn<T, ORDER, REPETITION>* m_itUrn;
+    int m_ordinalnumber;
+    Status m_status;
+    };
+
+    /*!
+     * Include guard for definitions.tpp
+     * definitions.tpp contains the definitions of the class/function templates
+     */
+    #if __has_include("newdefinitions.tpp")
+    #include "newdefinitions.tpp"
+    #endif //__has_include
+}   
 #endif // URN_HPP
