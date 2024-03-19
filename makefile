@@ -16,18 +16,18 @@ OBJDIR = obj
 
 
 #Rule1: Generate executable for UrnUnitTests
-$(OBJDIR)/UrnUnitTests: $(OBJDIR)/UrnUnitTests.o $(OBJDIR)/urn.o
-	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/UrnUnitTests $(OBJDIR)/UrnUnitTests.o $(OBJDIR)/urn.o
+$(OBJDIR)/test: $(OBJDIR)/test.o $(OBJDIR)/newurn.o
+	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/test $(OBJDIR)/test.o $(OBJDIR)/newurn.o
 
 
 #Rule2: Generate object code for urn.cpp
-$(OBJDIR)/urn.o: $(SRCDIR)/urn.cpp $(SRCDIR)/urn.hpp
-	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/urn.o -c $(SRCDIR)/urn.cpp
+$(OBJDIR)/newurn.o: $(SRCDIR)/newurn.cpp $(SRCDIR)/newurn.hpp
+	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/newurn.o -c $(SRCDIR)/newurn.cpp
 
 
 #Rule3: Generate object code for UrnUnitTests.cpp
-$(OBJDIR)/UrnUnitTests.o: $(SRCDIR)/UrnUnitTests.cpp $(SRCDIR)/urn.hpp
-	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/UrnUnitTests.o -c $(SRCDIR)/UrnUnitTests.cpp
+$(OBJDIR)/test.o: $(SRCDIR)/test.cpp $(SRCDIR)/newurn.hpp
+	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/test.o -c $(SRCDIR)/test.cpp
 
 
 #Rule 4: Delete all files and subdirectories

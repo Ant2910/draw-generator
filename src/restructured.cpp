@@ -91,225 +91,225 @@ uint factorial(const uint& n)
 class UrnOR
 {   
     public:
-    class Iterator
-    {   
-        public:
-            using iterator_category = std::random_access_iterator_tag;  //std::bidirectional_iterator_tag;
-            using difference_type   = std::ptrdiff_t;
-            using value_type        = Draw; //vector<unsigned int>
-            using pointer           = Draw*;  
-            using reference         = const Draw; //Kommentar anmerken
-            using size_type         = std::size_t;  //https://en.cppreference.com/w/cpp/types/size_t
+        class Iterator
+        {   
+            public:
+                using iterator_category = std::random_access_iterator_tag;  //std::bidirectional_iterator_tag;
+                using difference_type   = std::ptrdiff_t;
+                using value_type        = Draw; //vector<unsigned int>
+                using pointer           = Draw*;  
+                using reference         = const Draw; //Kommentar anmerken
+                using size_type         = std::size_t;  //https://en.cppreference.com/w/cpp/types/size_t
 
-            //Iterators: constructible, copy-constructible, copy-assignable, destructible and swappable
-            enum class Status
-            {
-                invalidFront,
-                valid,
-                invalidBack
-            };
-            
-            Iterator(const UrnOR* urn, const uint& ordinalnumber, const Status& status): m_urn{ urn },
-                                                                                         m_ordinalnumber{ static_cast<int>(ordinalnumber) },
-                                                                                         m_status { status }{}
-
-            Iterator() = default;   //Für ranges::random_access_iterator
-
-            string status() const
-            {
-                switch(m_status)
+                //Iterators: constructible, copy-constructible, copy-assignable, destructible and swappable
+                enum class Status
                 {
-                    case Status::invalidFront: return "invalidFront"; break;
-                    case Status::valid: return "valid"; break;
-                    case Status::invalidBack: return "invalidBack"; break;
-                    default: throw std::invalid_argument("m_status is invalid."); break;
-                }
-            }
-
-            uint n() const
-            {
-                return (*m_urn).n();
-            }
-
-            uint k() const
-            {
-                return (*m_urn).k();
-            }
-
-            uint z() const
-            {
-                return (*m_urn).z();
-            }
-
-            int ordinalnumber() const
-            {
-                return m_ordinalnumber;
-            }
-
-            const value_type operator*() const 
-            {   
-                if(m_ordinalnumber >= z() || m_ordinalnumber < 0)
-                {
-                    return Draw((k()), 0);
-                }
-                return (*m_urn).draw(m_ordinalnumber);
-            }
-
-            Iterator& operator++()
-            {   
-                ++m_ordinalnumber;
+                    invalidFront,
+                    valid,
+                    invalidBack
+                };
                 
-                if(m_ordinalnumber == 0)
-                {  
-                    m_status = Status::valid;
-                }
-                else if(m_ordinalnumber < 0)
+                Iterator(const UrnOR* urn, const uint& ordinalnumber, const Status& status): m_urn{ urn },
+                                                                                            m_ordinalnumber{ static_cast<int>(ordinalnumber) },
+                                                                                            m_status { status }{}
+
+                Iterator() = default;   //Für ranges::random_access_iterator
+
+                string status() const
                 {
-                    m_status = Status::invalidFront;
-                }
-                else if(m_ordinalnumber >= z())
-                {
-                    m_status = Status::invalidBack;
-                }
-                
-                return *this;
-            }
-                
-            Iterator operator++(int)
-            { 
-                auto temp {*this};
-                ++(*this);
-                return temp;
-            }
-            
-            Iterator& operator--()
-            {   
-                --m_ordinalnumber;
-                if(m_ordinalnumber == z()-1)
-                {  
-                    m_status = Status::valid;
-                }
-                else if(m_ordinalnumber < 0)
-                {
-                    m_status = Status::invalidFront;
-                }
-                else if(m_ordinalnumber >= z())
-                {
-                    m_status = Status::invalidBack;
-                }
-                return *this;
-            }
-            
-            Iterator operator--(int)
-            {
-                auto temp {*this};
-                --(*this);
-                return temp;
-            }
-            
-            bool operator== (const Iterator& other) const
-            { 
-                return (m_ordinalnumber == other.m_ordinalnumber);
-            }   
-
-            bool operator!= (const Iterator& other) const
-            {  
-                return !(*this == other); 
-            }
-
-            bool operator< (const Iterator& other) const
-            { 
-                return (m_ordinalnumber < other.m_ordinalnumber);
-            }
-
-            bool operator> (const Iterator& other) const 
-            { 
-                return (m_ordinalnumber > other.m_ordinalnumber);
-            }
-
-            bool operator<=(const Iterator& other) const
-            { 
-                return (*this == other || *this < other);
-            }
-
-            bool operator>=(const Iterator& other) const
-            { 
-                return (*this == other || *this > other);
-            }
-
-            //Addition mit += (bei allen additionen und subtraktionen Klammerausdrücke testen in catch2)
-            Iterator& operator+=(const difference_type& other)
-            {   
-                if(other >= 0)
-                {
-                    for(uint incCount{}; incCount < other; ++incCount)
+                    switch(m_status)
                     {
-                        ++(*this);
+                        case Status::invalidFront: return "invalidFront"; break;
+                        case Status::valid: return "valid"; break;
+                        case Status::invalidBack: return "invalidBack"; break;
+                        default: throw std::invalid_argument("m_status is invalid."); break;
                     }
                 }
-                else if(other < 0)
+
+                uint n() const
+                {
+                    return (*m_urn).n();
+                }
+
+                uint k() const
+                {
+                    return (*m_urn).k();
+                }
+
+                uint z() const
+                {
+                    return (*m_urn).z();
+                }
+
+                int ordinalnumber() const
+                {
+                    return m_ordinalnumber;
+                }
+
+                const value_type operator*() const 
                 {   
-                    long int positivOther {other * -1};
-                    for(uint decCount{}; decCount < positivOther; ++decCount)
+                    if(m_ordinalnumber >= z() || m_ordinalnumber < 0)
                     {
-                        --(*this);
+                        return Draw((k()), 0);
                     }
+                    return (*m_urn).draw(m_ordinalnumber);
                 }
-                return *this;
-            }
 
-            //Addition mit +
-            Iterator operator+(const difference_type& n) const //ist besser ohne const
-            { 
-                auto temp {*this};
-                return (temp += n);
-            }
-            
-            friend Iterator operator+(const difference_type& n, const Iterator& other) 
-            {
-                return other + n;
-            }
-            
-            //Subtraktion mit -=
-            Iterator& operator-=(const difference_type& n)
-            {
-                long int negativ {n * -1};
-                (*this) += negativ;
-                return *this;
-            }
-
-            //Subtraktion mit -
-            Iterator operator-(const difference_type& n) const
-            { 
-                auto temp {*this};
-                return (temp -= n);
-            }
-
-            //Difference
-            difference_type operator-(const Iterator& other) const
-            { 
-                return m_ordinalnumber - other.m_ordinalnumber;
-            }
-
-            //Index
-            //it[0] = {2,2}; ist nicht möglich da reference = const Draw und so kann der Wert nicht verändert werden
-            //Sollte aber kein Problem sein, da es für die Urn nicht möglich sein sollte
-            reference operator[](size_type index) const 
-            { 
-                if(index >= z() || index < 0)
+                Iterator& operator++()
+                {   
+                    ++m_ordinalnumber;
+                    
+                    if(m_ordinalnumber == 0)
+                    {  
+                        m_status = Status::valid;
+                    }
+                    else if(m_ordinalnumber < 0)
+                    {
+                        m_status = Status::invalidFront;
+                    }
+                    else if(m_ordinalnumber >= z())
+                    {
+                        m_status = Status::invalidBack;
+                    }
+                    
+                    return *this;
+                }
+                    
+                Iterator operator++(int)
+                { 
+                    auto temp {*this};
+                    ++(*this);
+                    return temp;
+                }
+                
+                Iterator& operator--()
+                {   
+                    --m_ordinalnumber;
+                    if(m_ordinalnumber == z()-1)
+                    {  
+                        m_status = Status::valid;
+                    }
+                    else if(m_ordinalnumber < 0)
+                    {
+                        m_status = Status::invalidFront;
+                    }
+                    else if(m_ordinalnumber >= z())
+                    {
+                        m_status = Status::invalidBack;
+                    }
+                    return *this;
+                }
+                
+                Iterator operator--(int)
                 {
-                    return Draw((k()), 0);
+                    auto temp {*this};
+                    --(*this);
+                    return temp;
                 }
-                return (*m_urn).draw(index);
-            }
+                
+                bool operator== (const Iterator& other) const
+                { 
+                    return (m_ordinalnumber == other.m_ordinalnumber);
+                }   
 
-            ~Iterator() = default;
+                bool operator!= (const Iterator& other) const
+                {  
+                    return !(*this == other); 
+                }
 
-        protected:
-            const UrnOR* m_urn;
-            int m_ordinalnumber;
-            Status m_status;
-    };
+                bool operator< (const Iterator& other) const
+                { 
+                    return (m_ordinalnumber < other.m_ordinalnumber);
+                }
+
+                bool operator> (const Iterator& other) const 
+                { 
+                    return (m_ordinalnumber > other.m_ordinalnumber);
+                }
+
+                bool operator<=(const Iterator& other) const
+                { 
+                    return (*this == other || *this < other);
+                }
+
+                bool operator>=(const Iterator& other) const
+                { 
+                    return (*this == other || *this > other);
+                }
+
+                //Addition mit += (bei allen additionen und subtraktionen Klammerausdrücke testen in catch2)
+                Iterator& operator+=(const difference_type& other)
+                {   
+                    if(other >= 0)
+                    {
+                        for(uint incCount{}; incCount < other; ++incCount)
+                        {
+                            ++(*this);
+                        }
+                    }
+                    else if(other < 0)
+                    {   
+                        long int positivOther {other * -1};
+                        for(uint decCount{}; decCount < positivOther; ++decCount)
+                        {
+                            --(*this);
+                        }
+                    }
+                    return *this;
+                }
+
+                //Addition mit +
+                Iterator operator+(const difference_type& n) const //ist besser ohne const
+                { 
+                    auto temp {*this};
+                    return (temp += n);
+                }
+                
+                friend Iterator operator+(const difference_type& n, const Iterator& other) 
+                {
+                    return other + n;
+                }
+                
+                //Subtraktion mit -=
+                Iterator& operator-=(const difference_type& n)
+                {
+                    long int negativ {n * -1};
+                    (*this) += negativ;
+                    return *this;
+                }
+
+                //Subtraktion mit -
+                Iterator operator-(const difference_type& n) const
+                { 
+                    auto temp {*this};
+                    return (temp -= n);
+                }
+
+                //Difference
+                difference_type operator-(const Iterator& other) const
+                { 
+                    return m_ordinalnumber - other.m_ordinalnumber;
+                }
+
+                //Index
+                //it[0] = {2,2}; ist nicht möglich da reference = const Draw und so kann der Wert nicht verändert werden
+                //Sollte aber kein Problem sein, da es für die Urn nicht möglich sein sollte
+                reference operator[](size_type index) const 
+                { 
+                    if(index >= z() || index < 0)
+                    {
+                        return Draw((k()), 0);
+                    }
+                    return (*m_urn).draw(index);
+                }
+
+                ~Iterator() = default;
+
+            protected:
+                const UrnOR* m_urn;
+                int m_ordinalnumber;
+                Status m_status;
+        };
 
     public:
         explicit UrnOR(uint n,uint k,uint check = 1):m_n { n },

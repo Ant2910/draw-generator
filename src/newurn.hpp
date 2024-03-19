@@ -32,6 +32,10 @@
 #include <algorithm>
 #include <iterator>
 
+namespace std
+{
+    std::string to_string(std::string ball);
+}
 
 /*! 
  * \namespace urn
@@ -43,6 +47,14 @@ namespace urn
 {
     using uint = unsigned int;       /*!< Using decleration to represent the set of natural numbers. */
     using Draw = std::vector<uint>;  /*!< Using decleration to represent a combination and permutation. */
+
+    //Helper function
+    
+    /*!
+     * \brief Helper function for calculating the faculty.
+     * \return Faculty of n of type uint.
+     */
+    uint factorial(const uint& n);
 
     /*!
      * \class UrnOR – urn where the order is important and which contains repetitions.
@@ -346,6 +358,111 @@ namespace urn
                        m_k; //!< The size of a draw from the urn.
     };
 
+    /*!
+     * \class UrnO – urn where the order is important and does not include repetitions.
+     */
+
+    class UrnO: public virtual UrnOR
+    {
+        public:
+            /*!
+             * \brief Constructor for UrnO.
+             * Constructs an exampler of UrnO.
+             * Declared as explicit to prevent implicit calls.
+             * Constructor calls the constructor of UrnOR to create an exampler.
+             * The check parameter is not intended to be specified by the user.
+             * The constructor body performs a check that is specific for the UrnO, if the check value is 2.
+             * If the UrnO exemplar to be created is invalid, an exception is thrown.
+             * 
+             * @param[in] n      The number of balls inside the urn.
+             * @param[in] k      The size of a draw from the urn.
+             * @param[in] check  The check value.
+             */
+            explicit UrnO(uint n,uint k,uint check = 2);
+
+            /*!
+             * \brief Getter method which returns z.
+             * \return z the number of all possible draws.
+             */
+            virtual uint z() const override;
+
+            /*!
+             * \brief Calculates the corresponding draw from a given ordinal number.
+             * \return Draw of type Draw.
+             */
+            virtual Draw draw(uint ordinalnumber) const override;
+
+            /*!
+             * \brief Specifies the subsequent draw for the specified draw, if it exists.
+             * \return Next draw of type Draw.
+             */
+            virtual Draw nextDraw(Draw draw) const override;
+
+            /*!
+             * \brief Specifies the previous draw for the specified draw, if it exists.
+             * \return Previous draw of type Draw.
+             */
+            virtual Draw backDraw(Draw draw) const override;
+
+            /*!
+             * \brief Method to search for duplicate elements.
+             * \return true/false depends if the draw is valid.
+             */
+            bool repetitions(const Draw& repDraw) const;
+    };
+
+    /*!
+    * \class UrnR – urn with unimportant order and with repetitions.
+    */
+
+    class UrnR: virtual public UrnOR
+    {
+        public:
+            /*!
+             * \brief Constructor for UrnR.
+             * Constructs an exampler of UrnR.
+             * Declared as explicit to prevent implicit calls.
+             * Constructor calls the constructor of UrnOR to create an exampler.
+             * The check parameter is not intended to be specified by the user.
+             * The constructor body performs a check that is specific for the UrnR, if the check value is 3.
+             * If the UrnR exemplar to be created is invalid, an exception is thrown.
+             * 
+             * @param[in] n      The number of balls inside the urn.
+             * @param[in] k      The size of a draw from the urn.
+             * @param[in] check  The check value.
+             */
+            explicit UrnR(uint n,uint k,uint check = 3);
+
+            /*!
+             * \brief Getter method which returns z.
+             * \return z the number of all possible draws.
+             */
+            virtual uint z() const override;
+
+            /*!
+             * \brief Calculates the corresponding draw from a given ordinal number.
+             * \return Draw of type Draw.
+             */
+            virtual Draw draw(uint ordinalnumber) const override;
+
+            /*!
+             * \brief Specifies the subsequent draw for the specified draw, if it exists.
+             * \return Next draw of type Draw.
+             */
+            virtual Draw nextDraw(Draw draw) const override;
+
+            /*!
+             * \brief Specifies the previous draw for the specified draw, if it exists.
+             * \return Previous draw of type Draw.
+             */
+            virtual Draw backDraw(Draw draw) const override;
+
+            /*!
+             * \brief Method to check if an element with a lower index value is greater than its neighbor element with index value plus one.
+             * \return true/false depends if the draw is valid.
+             */
+            bool unsorted(const Draw& unsortDraw) const;
+    };
 }
 
 #endif // URN_HPP
