@@ -596,6 +596,8 @@ public:
 
     Iterator(const GenericUrn<T, ORDER, REPETITION>* urn, const uint& ordinalnumber, const Status& status);
 
+    Iterator();
+
     string status() const;
     uint n() const;
     uint k() const;
@@ -618,7 +620,7 @@ public:
     
     Iterator& operator+=(const difference_type& other);
     Iterator operator+(const difference_type& n) const;
-    friend Iterator operator+(const difference_type& n, const Iterator& other);
+    friend Iterator operator+<>(const difference_type& n, const Iterator& other);
     Iterator& operator-=(const difference_type& n);
     Iterator operator-(const difference_type& n) const;
     difference_type operator-(const Iterator& other) const;
