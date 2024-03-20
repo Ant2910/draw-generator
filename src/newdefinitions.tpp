@@ -214,11 +214,13 @@ typename GenericUrn<T,ORDER,REPETITION>::Iterator GenericUrn<T,ORDER,REPETITION>
     return (temp += n);
 }
 
+//////////////////////////////
 template<typename T, bool ORDER, bool REPETITION>
 typename GenericUrn<T,ORDER,REPETITION>::Iterator operator+(const typename GenericUrn<T,ORDER,REPETITION>::Iterator::difference_type& n, const typename GenericUrn<T,ORDER,REPETITION>::Iterator::Iterator& other) 
 {
     return other + n;
 }
+//////////////////////////
 
 template<typename T, bool ORDER, bool REPETITION>
 typename GenericUrn<T,ORDER,REPETITION>::Iterator& GenericUrn<T,ORDER,REPETITION>::Iterator::operator-=(const typename GenericUrn<T,ORDER,REPETITION>::Iterator::difference_type& n)
@@ -291,13 +293,13 @@ typename GenericUrn<T, ORDER, REPETITION>::Iterator GenericUrn<T, ORDER, REPETIT
 }
 
 template <typename T,bool ORDER,bool REPETITION>
-auto GenericUrn<T, ORDER, REPETITION>::rbegin()
+std::reverse_iterator<typename GenericUrn<T,ORDER,REPETITION>::Iterator> GenericUrn<T, ORDER, REPETITION>::rbegin()
 {   
     return std::make_reverse_iterator(end());
 }
 
 template <typename T,bool ORDER,bool REPETITION>
-auto GenericUrn<T, ORDER, REPETITION>::rend()
+std::reverse_iterator<typename GenericUrn<T,ORDER,REPETITION>::Iterator> GenericUrn<T, ORDER, REPETITION>::rend()
 {
     return std::make_reverse_iterator(begin());
 }

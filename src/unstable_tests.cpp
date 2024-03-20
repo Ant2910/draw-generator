@@ -1,20 +1,54 @@
-//unstable_tests.cpp by Anton Hempel, November 26, 2023
+//UrnUnitTests.cpp by Anton Hempel, Ulrich Eisenecker, March 20, 2024
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
-#include "restructured.cpp"
+#include "newurn.hpp"
 #include <string>
 #include <concepts>
+using namespace urn;
 
 template<class T>
 concept RandomAccessRange = std::ranges::random_access_range<T>;
 
-//Funktion Iterator Test
-//Funktioniert aber vielleicht zu vector Rückgabe umbauen?
-string iterateRange(auto IteratorBegin, auto IteratorEnd)
+using uint = unsigned int;
+using Draw = std::vector<uint>;
+
+template<typename T>
+std::string to_string(const T& s)
+{
+    return std::to_string(s);
+}
+
+std::string to_string(const std::string& s)
+{  
+    return s;
+}
+
+char to_string(const char& s)
+{  
+    return s;
+}
+
+template<class T>
+std::string to_string(const std::vector<T>& draw)
+{
+    std::string stdraw {};
+    for(uint posCount{}; posCount < draw.size(); ++posCount)
+    {
+        stdraw += to_string(draw.at(posCount));
+        if(posCount != (draw.size()-1))
+        {
+            stdraw += " ";
+        }
+    }
+    return stdraw;
+}
+
+//Function for iterator test
+std::string iterateRange(auto IteratorBegin, auto IteratorEnd)
 {   
     auto ite {IteratorEnd};
-    string draws {};
+    std::string draws {};
     for(auto itb {IteratorBegin}; itb != ite; ++itb)
     {   
         draws += to_string(*itb);
@@ -22,15 +56,15 @@ string iterateRange(auto IteratorBegin, auto IteratorEnd)
     return draws;
 }
 
-//Test ADT für GenericUrn
+//Test ADT for GenericUrn
 namespace per
 {
     class Person
     {
         public:
-            Person(string name, uint age): m_name {name}, m_age{age}{}
+            Person(std::string name, uint age): m_name {name}, m_age{age}{}
 
-            string getName()
+            std::string getName()
             {
                 return m_name;
             }
@@ -47,15 +81,13 @@ namespace per
             }
 
         private:
-            string m_name {};
+            std::string m_name {};
             uint m_age {};  
     };
 
-    //Output funktion für ADT. sollte für alle ADTs die mit der GenericUrn benutzt werden, definiert werden
-    //ähnlich wie to_string
-    string outputPerson(vector <Person> draw)
+    std::string outputPerson(std::vector <Person> draw)
     {   
-        string stdraw {};
+        std::string stdraw {};
         for(uint posCount{}; posCount < draw.size(); ++posCount)
         {
             stdraw += (draw.at(posCount).getName()) + "," + to_string((draw.at(posCount).getAge()));
@@ -67,18 +99,16 @@ namespace per
         return stdraw;
     }
     
-    //to_string mit outputPerson ausgetauscht
-    string iterateRange(auto IteratorBegin, auto IteratorEnd)
+    std::string iterateRange(auto IteratorBegin, auto IteratorEnd)
     {   
         auto ite {IteratorEnd};
-        string draws {};
+        std::string draws {};
         for(auto itb {IteratorBegin}; itb != ite; ++itb)
         {   
             draws += outputPerson(*itb);
         }
         return draws;
     }
-    
 }
 
 //UrnOR
@@ -184,6 +214,9 @@ TEST_CASE("UrnOR")
         REQUIRE(to_string(*it) == "1 0");
         it -= 1;
         REQUIRE(to_string(*it) == "0 1");
+
+        auto iter = 3 + u.begin();
+        REQUIRE(to_string(*iter) == "1 1");
     }
 }
 
@@ -298,6 +331,9 @@ TEST_CASE("UrnO")
         REQUIRE(to_string(*it) == "1 0");
         it -= 1;
         REQUIRE(to_string(*it) == "0 2");
+
+        auto iter = 3 + u.begin();
+        REQUIRE(to_string(*iter) == "1 2");
     }
 }
 
@@ -412,6 +448,9 @@ TEST_CASE("UrnR")
         REQUIRE(to_string(*it) == "0 2");
         it -= 1;
         REQUIRE(to_string(*it) == "0 1");
+
+        auto iter = 3 + u.begin();
+        REQUIRE(to_string(*iter) == "1 1");
     }
 }
 
@@ -534,6 +573,9 @@ TEST_CASE("Urn")
         REQUIRE(to_string(*it) == "1 2");
         it -= 1;
         REQUIRE(to_string(*it) == "0 2");
+
+        auto iter = 2 + u.begin();
+        REQUIRE(to_string(*iter) == "1 2");
     }
 }
 
@@ -644,6 +686,9 @@ TEST_CASE("GenericUrn<TYPE,TRUE,TRUE>")
         REQUIRE(to_string(*it) == "Green Red");
         it -= 1;
         REQUIRE(to_string(*it) == "Red Green");
+
+        auto iter = 2 + u.begin();
+        REQUIRE(to_string(*iter) == "Green Red");
     }
 }
 
@@ -760,6 +805,9 @@ TEST_CASE("GenericUrn<TYPE,TRUE,FALSE>")
         REQUIRE(to_string(*it) == "B A");
         it -= 1;
         REQUIRE(to_string(*it) == "A C");
+
+        auto iter = 2 + u.begin();
+        REQUIRE(to_string(*iter) == "B A");
     }
 }
 
@@ -875,9 +923,11 @@ TEST_CASE("GenericUrn<TYPE,FALSE,TRUE>")
         REQUIRE(to_string(*it) == "3.140000 9.810000");
         it -= 1;
         REQUIRE(to_string(*it) == "3.140000 2.710000");
+
+        auto iter = 2 + u.begin();
+        REQUIRE(to_string(*iter) == "3.140000 9.810000");
     }
 }
-
 
 //GenericUrn<TYPE,FALSE,FALSE> = Urn
 TEST_CASE("GenericUrn<TYPE,FALSE,FALSE>")
@@ -999,5 +1049,8 @@ TEST_CASE("GenericUrn<TYPE,FALSE,FALSE>")
         REQUIRE(per::outputPerson(*it) == "Obi-Wan,38 Ahsoka,17");
         it -= 1;
         REQUIRE(per::outputPerson(*it) == "Anakin,22 Ahsoka,17");
+
+        auto iter = 2 + u.begin();
+        REQUIRE(per::outputPerson(*iter) == "Obi-Wan,38 Ahsoka,17");
     }
 }

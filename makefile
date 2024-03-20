@@ -16,8 +16,8 @@ OBJDIR = obj
 
 
 #Rule1: Generate executable for UrnUnitTests
-$(OBJDIR)/test: $(OBJDIR)/test.o $(OBJDIR)/newurn.o
-	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/test $(OBJDIR)/test.o $(OBJDIR)/newurn.o
+$(OBJDIR)/unstable_tests: $(OBJDIR)/unstable_tests.o $(OBJDIR)/newurn.o
+	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/unstable_tests $(OBJDIR)/unstable_tests.o $(OBJDIR)/newurn.o
 
 
 #Rule2: Generate object code for urn.cpp
@@ -26,8 +26,8 @@ $(OBJDIR)/newurn.o: $(SRCDIR)/newurn.cpp $(SRCDIR)/newurn.hpp
 
 
 #Rule3: Generate object code for UrnUnitTests.cpp
-$(OBJDIR)/test.o: $(SRCDIR)/test.cpp $(SRCDIR)/newurn.hpp
-	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/test.o -c $(SRCDIR)/test.cpp
+$(OBJDIR)/unstable_tests.o: $(SRCDIR)/unstable_tests.cpp $(SRCDIR)/newurn.hpp
+	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/unstable_tests.o -c $(SRCDIR)/unstable_tests.cpp
 
 
 #Rule 4: Delete all files and subdirectories
@@ -39,7 +39,7 @@ clean:
 
 #Rule 5: Execute UnitTests.cpp
 test:
-	$(OBJDIR)/./UrnUnitTests
+	$(OBJDIR)/./unstable_tests
 
 .PHONY: doc
 #Rule 6: Calls Doxygen to generate the documentation

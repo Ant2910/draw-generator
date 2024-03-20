@@ -8,8 +8,9 @@ string to_string(string s)
     return s;
 }
 
-string to_string(const Draw& draw)
-{   
+template<class T>
+string to_string(const vector<T>& draw)
+{
     string stdraw {};
     for(uint posCount{}; posCount < draw.size(); ++posCount)
     {
@@ -25,11 +26,11 @@ string to_string(const Draw& draw)
 int main()
 {
     GenericUrn<std::string,true,true> u {3,{"A","B","C"}};
-    /*
+    
     for(auto it {u.begin()}; it != u.end(); ++it)
     {
         cout << to_string(*it) << endl;
     }
-    */
+    
     return 0;
 }

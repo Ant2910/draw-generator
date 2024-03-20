@@ -282,12 +282,12 @@ namespace urn
         return Iterator(this,z(),Iterator::Status::invalidBack);
     }
 
-    auto UrnOR::rbegin()
+    std::reverse_iterator<UrnOR::Iterator>/*auto*/ UrnOR::rbegin()
     {   
         return std::make_reverse_iterator(end());
     }
 
-    auto UrnOR::rend()
+    std::reverse_iterator<UrnOR::Iterator>/*auto*/ UrnOR::rend()
     {
         return std::make_reverse_iterator(begin());
     }

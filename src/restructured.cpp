@@ -352,9 +352,9 @@ class UrnOR
             return Iterator(this,z(),Iterator::Status::invalidBack);
         }
 
-        auto rbegin()
+        std::reverse_iterator<Iterator> rbegin()
         {   
-            return make_reverse_iterator(end());
+            return std::make_reverse_iterator(end());
         }
 
         auto rend()
@@ -1136,18 +1136,14 @@ class Person
             }
             return stdraw;
         }
-
+*/
 int main()
 {   
+    UrnOR u {2,2};
+    auto i {u.rbegin()};
+    auto a {u.begin()};
     
-    GenericUrn<string,true,true> u {2,{"A","B"}};
-
-    GenericUrn<Person,true,true> ur {2,{{"Theo",12},{"Jonas",13}}};
-
-    auto it {ur.begin()};
-
-    cout << outputPerson(it[29]) << endl;
-
+    cout << typeid(a).name() << endl;
+    cout << (std::is_same_v<decltype(i), std::string> == true) << endl;
     return 0;
 }
-*/
