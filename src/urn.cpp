@@ -29,12 +29,13 @@ namespace urn
     //Helper functions
     
     uint factorial(const uint& n)
-    {
-        if(n == 0)
+    {   
+        uint result {1};
+        for(uint nCount {n}; nCount >= 1; --nCount)
         {
-            return 1;
+            result *= nCount;
         }
-        return n*factorial(n-1);
+        return result;
     }
 
     //Iterator
