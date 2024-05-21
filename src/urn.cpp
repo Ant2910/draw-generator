@@ -357,17 +357,12 @@ namespace urn
         }
             
         Draw draw(m_k, 0);
-        for (int posCount {static_cast<int>(m_k - 1)}; posCount >= 0; --posCount)
-        {
-            for (uint timesCount {m_n - 1}; timesCount >= 1; --timesCount)
-            {
-                if (static_cast<uint>(std::pow(m_n, posCount)) * timesCount <= ordinalnumber)
-                {
-                    draw[posCount] = timesCount;
-                    ordinalnumber -= static_cast<uint>(std::pow(m_n, posCount)) * timesCount;
-                    break;
-                }
-            }
+        uint powCalc {};
+        for (int posCount{static_cast<int>(m_k - 1)}; posCount >= 0; --posCount)
+        {   
+            powCalc = static_cast<uint>(std::pow(m_n, posCount));
+            draw[posCount] = ordinalnumber / powCalc;
+            ordinalnumber %= powCalc;
         }
         std::reverse(draw.begin(), draw.end());
         return draw;
