@@ -331,7 +331,7 @@ auto GenericUrn<T, ORDER, REPETITION>::nextDraw(const std::vector<T>& draw) cons
 }
 
 template <typename T,bool ORDER,bool REPETITION>
-auto GenericUrn<T, ORDER, REPETITION>::backDraw(const std::vector<T>& draw) const
+auto GenericUrn<T, ORDER, REPETITION>::previousDraw(const std::vector<T>& draw) const
 {
     Draw backDraw {};
     for(uint posCount {}; posCount < draw.size(); ++posCount)
@@ -344,7 +344,7 @@ auto GenericUrn<T, ORDER, REPETITION>::backDraw(const std::vector<T>& draw) cons
             }
         }
     }
-    return to_element(m_urn.backDraw(backDraw));
+    return to_element(m_urn.previousDraw(backDraw));
 }
 
 template <typename T,bool ORDER,bool REPETITION>

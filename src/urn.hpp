@@ -316,7 +316,7 @@ namespace urn
              * \brief Specifies the previous draw for the specified draw, if it exists.
              * \return Previous draw of type Draw.
              */
-            virtual Draw backDraw(Draw draw) const;
+            virtual Draw previousDraw(Draw draw) const;
 
             /*!
              * \brief Calculates the corresponding draw from a given ordinal number.
@@ -391,7 +391,7 @@ namespace urn
              * \brief Specifies the previous draw for the specified draw, if it exists.
              * \return Previous draw of type Draw.
              */
-            virtual Draw backDraw(Draw draw) const override;
+            virtual Draw previousDraw(Draw draw) const override;
 
             /*!
              * \brief Method to search for duplicate elements.
@@ -444,7 +444,7 @@ namespace urn
              * \brief Specifies the previous draw for the specified draw, if it exists.
              * \return Previous draw of type Draw.
              */
-            virtual Draw backDraw(Draw draw) const override;
+            virtual Draw previousDraw(Draw draw) const override;
 
             /*!
              * \brief Method to check if an element with a lower index value is greater than its neighbor element with index value plus one.
@@ -494,7 +494,7 @@ namespace urn
              * \brief Specifies the previous draw for the specified draw, if it exists.
              * \return Previous draw of type Draw.
              */
-            virtual Draw backDraw(Draw draw) const override;
+            virtual Draw previousDraw(Draw draw) const override;
     };
 
     /*!
@@ -820,7 +820,7 @@ namespace urn
              * \brief Call the associated draw() function of the specified urn.
              * \return Draw of type vector<T>.
              */
-            auto backDraw(const std::vector<T>& draw) const;
+            auto previousDraw(const std::vector<T>& draw) const;
 
             /*!
              * \brief Returns the first draw of the urn.

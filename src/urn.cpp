@@ -327,7 +327,7 @@ namespace urn
         throw std::overflow_error("There is no valid next draw.");
     }
 
-    Draw UrnOR::backDraw(Draw draw) const
+    Draw UrnOR::previousDraw(Draw draw) const
     {   
         if(valid(draw) && draw != Draw(m_k,0))
         {
@@ -445,7 +445,7 @@ namespace urn
         return result;
     }
 
-    Draw UrnO::backDraw(Draw draw) const
+    Draw UrnO::previousDraw(Draw draw) const
     {
         if(repetitions(draw) || draw == UrnO::draw(0))
         {
@@ -455,7 +455,7 @@ namespace urn
         Draw result {draw};
         do
         {
-            result = UrnOR::backDraw(result);
+            result = UrnOR::previousDraw(result);
         }while (repetitions(result));
         return result;
     }
@@ -534,7 +534,7 @@ namespace urn
         return result;
     }
 
-    Draw UrnR::backDraw(Draw draw) const
+    Draw UrnR::previousDraw(Draw draw) const
     {
         if(unsorted(draw) || draw == UrnR::draw(0))
         {
@@ -544,7 +544,7 @@ namespace urn
         Draw result {draw};
         do
         {
-            result = UrnOR::backDraw(result);
+            result = UrnOR::previousDraw(result);
         }while (unsorted(result));
         return result;
     }
@@ -615,7 +615,7 @@ namespace urn
         return result;
     }
 
-    Draw Urn::backDraw(Draw draw) const
+    Draw Urn::previousDraw(Draw draw) const
     {
         if(repetitions(draw) || unsorted(draw) || draw == Urn::draw(0))
         {
@@ -625,7 +625,7 @@ namespace urn
         Draw result {draw};
         do
         {
-            result = UrnOR::backDraw(result);
+            result = UrnOR::previousDraw(result);
         }while (repetitions(result) || unsorted(result));
         return result;
     }

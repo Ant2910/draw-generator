@@ -138,8 +138,8 @@ TEST_CASE("UrnOR")
         REQUIRE(to_string(u.lastDraw()) == "2 2 2");
         REQUIRE(to_string(u.nextDraw({0,0,0})) == "0 0 1");
         REQUIRE(to_string(u.nextDraw({1,1,2})) == "1 2 0");
-        REQUIRE(to_string(u.backDraw({0,0,1})) == "0 0 0");
-        REQUIRE(to_string(u.backDraw({1,1,2})) == "1 1 1");
+        REQUIRE(to_string(u.previousDraw({0,0,1})) == "0 0 0");
+        REQUIRE(to_string(u.previousDraw({1,1,2})) == "1 1 1");
         REQUIRE(to_string(u.draw(1)) == "0 0 1");
         REQUIRE(to_string(u.draw(0)) == "0 0 0");
         REQUIRE(to_string(u.draw(26)) == "2 2 2");
@@ -160,8 +160,8 @@ TEST_CASE("UrnOR")
         REQUIRE_THROWS_AS((u.nextDraw({2,2,2})),std::overflow_error);
         REQUIRE_THROWS_WITH((u.nextDraw({2,2,2})),"There is no valid next draw.");
 
-        REQUIRE_THROWS_AS((u.backDraw({0,0,0})),std::underflow_error);
-        REQUIRE_THROWS_WITH((u.backDraw({0,0,0})),"There is no valid back draw.");
+        REQUIRE_THROWS_AS((u.previousDraw({0,0,0})),std::underflow_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({0,0,0})),"There is no valid back draw.");
     }
 
     //Urn Iterator Test
@@ -247,8 +247,8 @@ TEST_CASE("UrnO")
         REQUIRE(to_string(u.lastDraw()) == "2 1 0");
         REQUIRE(to_string(u.nextDraw({0,1,2})) == "0 2 1");
         REQUIRE(to_string(u.nextDraw({2,0,1})) == "2 1 0");
-        REQUIRE(to_string(u.backDraw({2,1,0})) == "2 0 1");
-        REQUIRE(to_string(u.backDraw({1,0,2})) == "0 2 1");
+        REQUIRE(to_string(u.previousDraw({2,1,0})) == "2 0 1");
+        REQUIRE(to_string(u.previousDraw({1,0,2})) == "0 2 1");
         REQUIRE(to_string(u.draw(1)) == "0 2 1");
         REQUIRE(to_string(u.draw(0)) == "0 1 2");
         REQUIRE(to_string(u.draw(5)) == "2 1 0");
@@ -270,15 +270,15 @@ TEST_CASE("UrnO")
         REQUIRE_THROWS_AS((u.nextDraw({2,1,0})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({2,1,0})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({0,1,2})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({0,1,2})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({0,1,2})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({0,1,2})),"Either the specified draw is incorrect or there is no next valid draw");
 
         //Test for repetitions
         REQUIRE_THROWS_AS((u.nextDraw({0,0,1})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({0,0,1})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({0,1,1})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({0,1,1})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({0,1,1})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({0,1,1})),"Either the specified draw is incorrect or there is no next valid draw");
     }
 
     //Urn Iterator Test
@@ -364,8 +364,8 @@ TEST_CASE("UrnR")
         REQUIRE(to_string(u.lastDraw()) == "2 2 2");
         REQUIRE(to_string(u.nextDraw({0,1,2})) == "0 2 2");
         REQUIRE(to_string(u.nextDraw({0,2,2})) == "1 1 1");
-        REQUIRE(to_string(u.backDraw({1,1,1})) == "0 2 2");
-        REQUIRE(to_string(u.backDraw({0,2,2})) == "0 1 2");
+        REQUIRE(to_string(u.previousDraw({1,1,1})) == "0 2 2");
+        REQUIRE(to_string(u.previousDraw({0,2,2})) == "0 1 2");
         REQUIRE(to_string(u.draw(1)) == "0 0 1");
         REQUIRE(to_string(u.draw(0)) == "0 0 0");
         REQUIRE(to_string(u.draw(9)) == "2 2 2");
@@ -387,15 +387,15 @@ TEST_CASE("UrnR")
         REQUIRE_THROWS_AS((u.nextDraw({2,2,2})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({2,2,2})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({0,0,0})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({0,0,0})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({0,0,0})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({0,0,0})),"Either the specified draw is incorrect or there is no next valid draw");
 
         //Test for unsorted
         REQUIRE_THROWS_AS((u.nextDraw({2,1,0})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({2,1,0})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({1,0,1})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({1,0,1})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({1,0,1})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({1,0,1})),"Either the specified draw is incorrect or there is no next valid draw");
     }
 
     //Urn Iterator Test
@@ -481,8 +481,8 @@ TEST_CASE("Urn")
         REQUIRE(to_string(u.lastDraw()) == "2 3");
         REQUIRE(to_string(u.nextDraw({0,2})) == "0 3");
         REQUIRE(to_string(u.nextDraw({0,3})) == "1 2");
-        REQUIRE(to_string(u.backDraw({1,2})) == "0 3");
-        REQUIRE(to_string(u.backDraw({0,3})) == "0 2");
+        REQUIRE(to_string(u.previousDraw({1,2})) == "0 3");
+        REQUIRE(to_string(u.previousDraw({0,3})) == "0 2");
         REQUIRE(to_string(u.draw(1)) == "0 2");
         REQUIRE(to_string(u.draw(0)) == "0 1");
         REQUIRE(to_string(u.draw(5)) == "2 3");
@@ -504,22 +504,22 @@ TEST_CASE("Urn")
         REQUIRE_THROWS_AS((u.nextDraw({1,2})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({1,2})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({0,1})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({0,1})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({0,1})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({0,1})),"Either the specified draw is incorrect or there is no next valid draw");
 
         //Test for unsorted
         REQUIRE_THROWS_AS((u.nextDraw({1,0})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({1,0})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({2,0})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({2,0})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({2,0})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({2,0})),"Either the specified draw is incorrect or there is no next valid draw");
 
         //Test for repetitions
         REQUIRE_THROWS_AS((u.nextDraw({0,0})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({0,0})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({1,1})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({1,1})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({1,1})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({1,1})),"Either the specified draw is incorrect or there is no next valid draw");
     
     }
 
@@ -608,8 +608,8 @@ TEST_CASE("GenericUrn<TYPE,TRUE,TRUE>")
         REQUIRE(to_string(u.lastDraw()) == "Blue Blue Blue");
         REQUIRE(to_string(u.nextDraw({"Red","Red","Red"})) == "Red Red Green");
         REQUIRE(to_string(u.nextDraw({"Green","Green","Blue"})) == "Green Blue Red");
-        REQUIRE(to_string(u.backDraw({"Red","Red","Green"})) == "Red Red Red");
-        REQUIRE(to_string(u.backDraw({"Green","Green","Blue"})) == "Green Green Green");
+        REQUIRE(to_string(u.previousDraw({"Red","Red","Green"})) == "Red Red Red");
+        REQUIRE(to_string(u.previousDraw({"Green","Green","Blue"})) == "Green Green Green");
         REQUIRE(to_string(u.draw(1)) == "Red Red Green");
         REQUIRE(to_string(u.draw(0)) == "Red Red Red");
         REQUIRE(to_string(u.draw(26)) == "Blue Blue Blue");
@@ -630,8 +630,8 @@ TEST_CASE("GenericUrn<TYPE,TRUE,TRUE>")
         REQUIRE_THROWS_AS((u.nextDraw({"Blue","Blue","Blue"})),std::overflow_error);
         REQUIRE_THROWS_WITH((u.nextDraw({"Blue","Blue","Blue"})),"There is no valid next draw.");
 
-        REQUIRE_THROWS_AS((u.backDraw({"Red","Red","Red"})),std::underflow_error);
-        REQUIRE_THROWS_WITH((u.backDraw({"Red","Red","Red"})),"There is no valid back draw.");
+        REQUIRE_THROWS_AS((u.previousDraw({"Red","Red","Red"})),std::underflow_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({"Red","Red","Red"})),"There is no valid back draw.");
     }
 
     //Urn Iterator Test
@@ -719,8 +719,8 @@ TEST_CASE("GenericUrn<TYPE,TRUE,FALSE>")
         REQUIRE(to_string(u.lastDraw()) == "C B A");
         REQUIRE(to_string(u.nextDraw({'A','B','C'})) == "A C B");
         REQUIRE(to_string(u.nextDraw({'C','A','B'})) == "C B A");
-        REQUIRE(to_string(u.backDraw({'C','B','A'})) == "C A B");
-        REQUIRE(to_string(u.backDraw({'B','A','C'})) == "A C B");
+        REQUIRE(to_string(u.previousDraw({'C','B','A'})) == "C A B");
+        REQUIRE(to_string(u.previousDraw({'B','A','C'})) == "A C B");
         REQUIRE(to_string(u.draw(1)) == "A C B");
         REQUIRE(to_string(u.draw(0)) == "A B C");
         REQUIRE(to_string(u.draw(5)) == "C B A");
@@ -742,15 +742,15 @@ TEST_CASE("GenericUrn<TYPE,TRUE,FALSE>")
         REQUIRE_THROWS_AS((u.nextDraw({'C','B','A'})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({'C','B','A'})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({'A','B','C'})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({'A','B','C'})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({'A','B','C'})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({'A','B','C'})),"Either the specified draw is incorrect or there is no next valid draw");
 
         //Test for repetitions
         REQUIRE_THROWS_AS((u.nextDraw({'A','A','B'})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({'A','A','B'})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({'A','B','B'})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({'A','B','B'})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({'A','B','B'})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({'A','B','B'})),"Either the specified draw is incorrect or there is no next valid draw");
     }
 
     //Urn Iterator Test
@@ -837,8 +837,8 @@ TEST_CASE("GenericUrn<TYPE,FALSE,TRUE>")
         REQUIRE(to_string(u.lastDraw()) == "9.810000 9.810000 9.810000");
         REQUIRE(to_string(u.nextDraw({3.14,2.71,9.81})) == "3.140000 9.810000 9.810000");
         REQUIRE(to_string(u.nextDraw({3.14,9.81,9.81})) == "2.710000 2.710000 2.710000");
-        REQUIRE(to_string(u.backDraw({2.71,2.71,2.71})) == "3.140000 9.810000 9.810000");
-        REQUIRE(to_string(u.backDraw({3.14,9.81,9.81})) == "3.140000 2.710000 9.810000");
+        REQUIRE(to_string(u.previousDraw({2.71,2.71,2.71})) == "3.140000 9.810000 9.810000");
+        REQUIRE(to_string(u.previousDraw({3.14,9.81,9.81})) == "3.140000 2.710000 9.810000");
         REQUIRE(to_string(u.draw(1)) == "3.140000 3.140000 2.710000");
         REQUIRE(to_string(u.draw(0)) == "3.140000 3.140000 3.140000");
         REQUIRE(to_string(u.draw(9)) == "9.810000 9.810000 9.810000");
@@ -860,15 +860,15 @@ TEST_CASE("GenericUrn<TYPE,FALSE,TRUE>")
         REQUIRE_THROWS_AS((u.nextDraw({9.81,9.81,9.81})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({9.81,9.81,9.81})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({3.14,3.14,3.14})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({3.14,3.14,3.14})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({3.14,3.14,3.14})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({3.14,3.14,3.14})),"Either the specified draw is incorrect or there is no next valid draw");
 
         //Test for unsorted
         REQUIRE_THROWS_AS((u.nextDraw({9.81,2.71,3.14})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({9.81,2.71,3.14})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({2.71,3.14,2.71})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({2.71,3.14,2.71})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({2.71,3.14,2.71})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({2.71,3.14,2.71})),"Either the specified draw is incorrect or there is no next valid draw");
     }
 
     //Urn Iterator Test
@@ -955,8 +955,8 @@ TEST_CASE("GenericUrn<TYPE,FALSE,FALSE>")
         REQUIRE(per::outputPerson(u.lastDraw()) == "Ahsoka,17 Rex,26");
         REQUIRE(per::outputPerson(u.nextDraw({{"Anakin",22},{"Ahsoka",17}})) == "Anakin,22 Rex,26");
         REQUIRE(per::outputPerson(u.nextDraw({{"Anakin",22},{"Rex",26}})) == "Obi-Wan,38 Ahsoka,17");
-        REQUIRE(per::outputPerson(u.backDraw({{"Obi-Wan",38},{"Ahsoka",17}})) == "Anakin,22 Rex,26");
-        REQUIRE(per::outputPerson(u.backDraw({{"Anakin",22},{"Rex",26}})) == "Anakin,22 Ahsoka,17");
+        REQUIRE(per::outputPerson(u.previousDraw({{"Obi-Wan",38},{"Ahsoka",17}})) == "Anakin,22 Rex,26");
+        REQUIRE(per::outputPerson(u.previousDraw({{"Anakin",22},{"Rex",26}})) == "Anakin,22 Ahsoka,17");
         REQUIRE(per::outputPerson(u.draw(1)) == "Anakin,22 Ahsoka,17");
         REQUIRE(per::outputPerson(u.draw(0)) == "Anakin,22 Obi-Wan,38");
         REQUIRE(per::outputPerson(u.draw(5)) == "Ahsoka,17 Rex,26");
@@ -978,22 +978,22 @@ TEST_CASE("GenericUrn<TYPE,FALSE,FALSE>")
         REQUIRE_THROWS_AS((u.nextDraw({{"Obi-Wan",38},{"Ahsoka",17}})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({{"Obi-Wan",38},{"Ahsoka",17}})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({{"Anakin",22},{"Obi-Wan",38}})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({{"Anakin",22},{"Obi-Wan",38}})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({{"Anakin",22},{"Obi-Wan",38}})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({{"Anakin",22},{"Obi-Wan",38}})),"Either the specified draw is incorrect or there is no next valid draw");
 
         //Test for unsorted
         REQUIRE_THROWS_AS((u.nextDraw({{"Obi-Wan",38},{"Anakin",22}})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({{"Obi-Wan",38},{"Anakin",22}})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({{"Ahsoka",17},{"Anakin",22}})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({{"Ahsoka",17},{"Anakin",22}})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({{"Ahsoka",17},{"Anakin",22}})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({{"Ahsoka",17},{"Anakin",22}})),"Either the specified draw is incorrect or there is no next valid draw");
 
         //Test for repetitions
         REQUIRE_THROWS_AS((u.nextDraw({{"Anakin",22},{"Anakin",22}})),std::domain_error);
         REQUIRE_THROWS_WITH((u.nextDraw({{"Anakin",22},{"Anakin",22}})),"Either the specified draw is incorrect or there is no next valid draw");
 
-        REQUIRE_THROWS_AS((u.backDraw({{"Obi-Wan",38},{"Obi-Wan",38}})),std::domain_error);
-        REQUIRE_THROWS_WITH((u.backDraw({{"Obi-Wan",38},{"Obi-Wan",38}})),"Either the specified draw is incorrect or there is no next valid draw");
+        REQUIRE_THROWS_AS((u.previousDraw({{"Obi-Wan",38},{"Obi-Wan",38}})),std::domain_error);
+        REQUIRE_THROWS_WITH((u.previousDraw({{"Obi-Wan",38},{"Obi-Wan",38}})),"Either the specified draw is incorrect or there is no next valid draw");
     
     }
 
