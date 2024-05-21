@@ -80,9 +80,9 @@ namespace urn
         return (*m_urn).k();
     }
 
-    uint UrnOR::Iterator::z() const
+    uint UrnOR::Iterator::size() const
     {
-        return (*m_urn).z();
+        return (*m_urn).size();
     }
 
     int UrnOR::Iterator::ordinalnumber() const
@@ -92,7 +92,7 @@ namespace urn
 
     const value_type UrnOR::Iterator::operator*() const 
     {   
-        if(m_ordinalnumber >= z() || m_ordinalnumber < 0)
+        if(m_ordinalnumber >= size() || m_ordinalnumber < 0)
         {
             return Draw((k()), 0);
         }
@@ -111,7 +111,7 @@ namespace urn
         {
             m_status = Status::invalidFront;
         }
-        else if(m_ordinalnumber >= z())
+        else if(m_ordinalnumber >= size())
         {
             m_status = Status::invalidBack;
         }      
@@ -128,7 +128,7 @@ namespace urn
     UrnOR::Iterator& UrnOR::Iterator::operator--()
     {   
         --m_ordinalnumber;
-        if(m_ordinalnumber == z()-1)
+        if(m_ordinalnumber == size()-1)
         {  
             m_status = Status::valid;
         }
@@ -136,7 +136,7 @@ namespace urn
         {
             m_status = Status::invalidFront;
         }
-        else if(m_ordinalnumber >= z())
+        else if(m_ordinalnumber >= size())
         {
             m_status = Status::invalidBack;
         }
@@ -231,7 +231,7 @@ namespace urn
 
     reference UrnOR::Iterator::operator[](size_type index) const 
     { 
-        if(index >= z() || index < 0)
+        if(index >= size() || index < 0)
         {
             return Draw((k()), 0);
         }
@@ -262,7 +262,7 @@ namespace urn
         return m_k;
     }
 
-    uint UrnOR::z() const 
+    uint UrnOR::size() const 
     {   
         if(m_k == 0)    
         {
@@ -278,7 +278,7 @@ namespace urn
 
     UrnOR::Iterator UrnOR::end()
     {
-        return Iterator(this,z(),Iterator::Status::invalidBack);
+        return Iterator(this,size(),Iterator::Status::invalidBack);
     }
 
     std::reverse_iterator<UrnOR::Iterator>/*auto*/ UrnOR::rbegin()
@@ -350,7 +350,7 @@ namespace urn
 
     Draw UrnOR::draw(uint ordinalnumber) const
     {   
-        if(ordinalnumber < 0 || ordinalnumber >= UrnOR::z())
+        if(ordinalnumber < 0 || ordinalnumber >= UrnOR::size())
         {
             throw std::domain_error("There is no valid draw for this ordinalnumber.");
         }
@@ -379,7 +379,7 @@ namespace urn
 
     Draw UrnOR::lastDraw() const
     {
-        return draw(z()-1);
+        return draw(size()-1);
     }
 
     UrnOR::~UrnOR() = default;
@@ -394,7 +394,7 @@ namespace urn
         }
     }
 
-    uint UrnO::z() const
+    uint UrnO::size() const
     {   
         if(m_k == 0)
         {
@@ -405,7 +405,7 @@ namespace urn
 
     Draw UrnO::draw(uint ordinalnumber) const
     {   
-        if(ordinalnumber < 0 || ordinalnumber >= z())
+        if(ordinalnumber < 0 || ordinalnumber >= size())
         {
             throw std::domain_error("There is no valid draw for this ordinalnumber.");
         }
@@ -417,7 +417,7 @@ namespace urn
             elements.push_back(fillCount);
         }
 
-        uint currentVariations {z()};
+        uint currentVariations {size()};
         uint index {};
         for(uint upCount{}; upCount < m_k; ++upCount)
         {
@@ -432,7 +432,7 @@ namespace urn
 
     Draw UrnO::nextDraw(Draw draw) const
     {   
-        if(repetitions(draw) || draw == UrnO::draw(z()-1))
+        if(repetitions(draw) || draw == UrnO::draw(size()-1))
         {
             throw std::domain_error("Either the specified draw is incorrect or there is no next valid draw");
         }
@@ -485,7 +485,7 @@ namespace urn
         }
     }
 
-    uint UrnR::z() const
+    uint UrnR::size() const
     {   
             
         if(m_k == 0)
@@ -497,14 +497,14 @@ namespace urn
         
     Draw UrnR::draw(uint ordinalnumber) const
     {   
-        if(ordinalnumber < 0 || ordinalnumber >= z())
+        if(ordinalnumber < 0 || ordinalnumber >= size())
         {
             throw std::domain_error("There is no valid draw for this ordinalnumber.");
         }
             
         Draw result {};
         int unsortedCount {-1};
-        for(uint upCount {}; upCount < UrnOR::z(); ++upCount)
+        for(uint upCount {}; upCount < UrnOR::size(); ++upCount)
         {   
             result = UrnOR::draw(upCount);
             if(!unsorted(result))
@@ -521,7 +521,7 @@ namespace urn
 
     Draw UrnR::nextDraw(Draw draw) const
     {   
-        if(unsorted(draw) || draw == UrnR::draw(z()-1))
+        if(unsorted(draw) || draw == UrnR::draw(size()-1))
         {
             throw std::domain_error("Either the specified draw is incorrect or there is no next valid draw");
         }
@@ -567,7 +567,7 @@ namespace urn
                                        UrnO { n,k,1 },
                                        UrnR { n,k,1 }{}
 
-    uint Urn::z() const
+    uint Urn::size() const
     {   
         if(m_k == 0)
         {
@@ -578,14 +578,14 @@ namespace urn
 
     Draw Urn::draw(uint ordinalnumber) const
     {
-        if(ordinalnumber < 0 || ordinalnumber >= z())
+        if(ordinalnumber < 0 || ordinalnumber >= size())
         {
             throw std::domain_error("There is no valid draw for this ordinalnumber.");
         }
             
         Draw result {};
         int drawCount {-1};
-        for(uint upCount {}; upCount < UrnOR::z(); ++upCount)
+        for(uint upCount {}; upCount < UrnOR::size(); ++upCount)
         {   
             result = UrnOR::draw(upCount);
             if(!unsorted(result) && !repetitions(result))
@@ -602,7 +602,7 @@ namespace urn
 
     Draw Urn::nextDraw(Draw draw) const
     {   
-        if(repetitions(draw) || unsorted(draw) || draw == Urn::draw(z()-1))
+        if(repetitions(draw) || unsorted(draw) || draw == Urn::draw(size()-1))
         {
             throw std::domain_error("Either the specified draw is incorrect or there is no next valid draw");
         }

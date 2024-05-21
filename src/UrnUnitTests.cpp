@@ -120,7 +120,7 @@ TEST_CASE("UrnOR")
         UrnOR u {0,0};
         REQUIRE(u.n() == 0);
         REQUIRE(u.k() == 0);
-        REQUIRE(u.z() == 0);
+        REQUIRE(u.size() == 0);
     }
 
     SECTION("2")
@@ -128,7 +128,7 @@ TEST_CASE("UrnOR")
         UrnOR u {2,3};
         REQUIRE(u.n() == 2);
         REQUIRE(u.k() == 3);
-        REQUIRE(u.z() == 8);
+        REQUIRE(u.size() == 8);
     }
 
     SECTION("3")
@@ -229,7 +229,7 @@ TEST_CASE("UrnO")
         UrnO u {0,0};
         REQUIRE(u.n() == 0);
         REQUIRE(u.k() == 0);
-        REQUIRE(u.z() == 0);
+        REQUIRE(u.size() == 0);
     }
 
     SECTION("2")
@@ -237,7 +237,7 @@ TEST_CASE("UrnO")
         UrnO u {3,2};
         REQUIRE(u.n() == 3);
         REQUIRE(u.k() == 2);
-        REQUIRE(u.z() == 6);
+        REQUIRE(u.size() == 6);
     }
 
     SECTION("3")
@@ -346,7 +346,7 @@ TEST_CASE("UrnR")
         UrnR u {3,2};
         REQUIRE(u.n() == 3);
         REQUIRE(u.k() == 2);
-        REQUIRE(u.z() == 6);
+        REQUIRE(u.size() == 6);
     }
 
     SECTION("2")
@@ -354,7 +354,7 @@ TEST_CASE("UrnR")
         UrnR u {3,3};
         REQUIRE(u.n() == 3);
         REQUIRE(u.k() == 3);
-        REQUIRE(u.z() == 10);
+        REQUIRE(u.size() == 10);
     }
 
     SECTION("3")
@@ -463,7 +463,7 @@ TEST_CASE("Urn")
         Urn u {5,3};
         REQUIRE(u.n() == 5);
         REQUIRE(u.k() == 3);
-        REQUIRE(u.z() == 10);
+        REQUIRE(u.size() == 10);
     }
 
     SECTION("2")
@@ -471,7 +471,7 @@ TEST_CASE("Urn")
         Urn u {3,3};
         REQUIRE(u.n() == 3);
         REQUIRE(u.k() == 3);
-        REQUIRE(u.z() == 1);
+        REQUIRE(u.size() == 1);
     }
 
     SECTION("3")
@@ -590,7 +590,7 @@ TEST_CASE("GenericUrn<TYPE,TRUE,TRUE>")
         GenericUrn<std::string,true,true> u {0,{}};
         REQUIRE(u.n() == 0);
         REQUIRE(u.k() == 0);
-        REQUIRE(u.z() == 0);
+        REQUIRE(u.size() == 0);
     }
 
     SECTION("2")
@@ -598,7 +598,7 @@ TEST_CASE("GenericUrn<TYPE,TRUE,TRUE>")
         GenericUrn<std::string,true,true> u {3,{"Red","Green"}};
         REQUIRE(u.n() == 2);
         REQUIRE(u.k() == 3);
-        REQUIRE(u.z() == 8);
+        REQUIRE(u.size() == 8);
     }
 
     SECTION("3")
@@ -701,7 +701,7 @@ TEST_CASE("GenericUrn<TYPE,TRUE,FALSE>")
         GenericUrn<char,true,false> u {0,{}};
         REQUIRE(u.n() == 0);
         REQUIRE(u.k() == 0);
-        REQUIRE(u.z() == 0);
+        REQUIRE(u.size() == 0);
     }
 
     SECTION("2")
@@ -709,7 +709,7 @@ TEST_CASE("GenericUrn<TYPE,TRUE,FALSE>")
         GenericUrn<char,true,false> u {2,{'A','B','C'}};
         REQUIRE(u.n() == 3);
         REQUIRE(u.k() == 2);
-        REQUIRE(u.z() == 6);
+        REQUIRE(u.size() == 6);
     }
 
     SECTION("3")
@@ -819,7 +819,7 @@ TEST_CASE("GenericUrn<TYPE,FALSE,TRUE>")
         GenericUrn<double,false,true> u {2,{3.14,2.71,9.81}};
         REQUIRE(u.n() == 3);
         REQUIRE(u.k() == 2);
-        REQUIRE(u.z() == 6);
+        REQUIRE(u.size() == 6);
     }
 
     SECTION("2")
@@ -827,7 +827,7 @@ TEST_CASE("GenericUrn<TYPE,FALSE,TRUE>")
         GenericUrn<double,false,true> u {3,{3.14,2.71,9.81}};
         REQUIRE(u.n() == 3);
         REQUIRE(u.k() == 3);
-        REQUIRE(u.z() == 10);
+        REQUIRE(u.size() == 10);
     }
 
     SECTION("3")
@@ -937,7 +937,7 @@ TEST_CASE("GenericUrn<TYPE,FALSE,FALSE>")
         GenericUrn<per::Person,false,false> u {2,{{"Anakin",22},{"Obi-Wan",38},{"Ahsoka",17}}};
         REQUIRE(u.n() == 3);
         REQUIRE(u.k() == 2);
-        REQUIRE(u.z() == 3);
+        REQUIRE(u.size() == 3);
     }
 
     SECTION("2")
@@ -945,7 +945,7 @@ TEST_CASE("GenericUrn<TYPE,FALSE,FALSE>")
         GenericUrn<per::Person,false,false> u {3,{{"Anakin",22},{"Obi-Wan",38},{"Ahsoka",17}}};
         REQUIRE(u.n() == 3);
         REQUIRE(u.k() == 3);
-        REQUIRE(u.z() == 1);
+        REQUIRE(u.size() == 1);
     }
 
     SECTION("3")

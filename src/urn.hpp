@@ -111,10 +111,10 @@ namespace urn
                     uint k() const;
 
                     /*!
-                     * \brief Getter method which returns z.
-                     * \return z the number of all possible draws.
+                     * \brief Getter method which returns size.
+                     * \return size the number of all possible draws.
                      */
-                    uint z() const;
+                    uint size() const;
     
                     /*!
                      * \brief Getter method which returns ordinalnumber.
@@ -271,10 +271,10 @@ namespace urn
             uint k() const;
 
             /*!
-             * \brief Getter method which returns z.
-             * \return z the number of all possible draws.
+             * \brief Getter method which returns size.
+             * \return size the number of all possible draws.
              */
-            virtual uint z() const; 
+            virtual uint size() const; 
 
             /*!
              * \brief Begin iterator.
@@ -370,10 +370,10 @@ namespace urn
             explicit UrnO(uint n,uint k,uint check = 2);
 
             /*!
-             * \brief Getter method which returns z.
-             * \return z the number of all possible draws.
+             * \brief Getter method which returns size.
+             * \return size the number of all possible draws.
              */
-            virtual uint z() const override;
+            virtual uint size() const override;
 
             /*!
              * \brief Calculates the corresponding draw from a given ordinal number.
@@ -423,10 +423,10 @@ namespace urn
             explicit UrnR(uint n,uint k,uint check = 3);
 
             /*!
-             * \brief Getter method which returns z.
-             * \return z the number of all possible draws.
+             * \brief Getter method which returns size.
+             * \return size the number of all possible draws.
              */
-            virtual uint z() const override;
+            virtual uint size() const override;
 
             /*!
              * \brief Calculates the corresponding draw from a given ordinal number.
@@ -473,10 +473,10 @@ namespace urn
             explicit Urn(uint n,uint k,uint check = 3);
 
             /*!
-             * \brief Getter method which returns z.
-             * \return z the number of all possible draws.
+             * \brief Getter method which returns size.
+             * \return size the number of all possible draws.
              */
-            virtual uint z() const override;
+            virtual uint size() const override;
 
             /*!
              * \brief Calculates the corresponding draw from a given ordinal number.
@@ -605,10 +605,10 @@ namespace urn
                     uint k() const;
     
                     /*!
-                     * \brief Getter method which returns z.
-                     * \return z the number of all possible draws.
+                     * \brief Getter method which returns size.
+                     * \return size the number of all possible draws.
                      */
-                    uint z() const;
+                    uint size() const;
 
                     /*!
                      * \brief Getter method which returns ordinalnumber.
@@ -769,10 +769,10 @@ namespace urn
             uint k() const;
 
             /*!
-             * \brief Getter method which returns z.
-             * \return z the number of all possible draws.
+             * \brief Getter method which returns size.
+             * \return size the number of all possible draws.
              */
-            uint z() const;
+            uint size() const;
 
             /*!
              * \brief Begin iterator.

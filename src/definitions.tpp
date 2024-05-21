@@ -73,9 +73,9 @@ uint GenericUrn<T,ORDER,REPETITION>::Iterator::k() const
 }
 
 template<typename T, bool ORDER, bool REPETITION>
-uint GenericUrn<T,ORDER,REPETITION>::Iterator::z() const
+uint GenericUrn<T,ORDER,REPETITION>::Iterator::size() const
 {
-    return (*m_itUrn).z();
+    return (*m_itUrn).size();
 }
 
 template<typename T, bool ORDER, bool REPETITION>
@@ -87,7 +87,7 @@ int GenericUrn<T,ORDER,REPETITION>::Iterator::ordinalnumber() const
 template<typename T, bool ORDER, bool REPETITION>
 const typename GenericUrn<T,ORDER,REPETITION>::Iterator::value_type GenericUrn<T,ORDER,REPETITION>::Iterator::operator*() const 
 {   
-    if(m_ordinalnumber >= z() || m_ordinalnumber < 0)
+    if(m_ordinalnumber >= size() || m_ordinalnumber < 0)
     {   
         throw std::domain_error("There is no valid draw for this ordinalnumber.");
     }
@@ -107,7 +107,7 @@ typename GenericUrn<T,ORDER,REPETITION>::Iterator& GenericUrn<T,ORDER,REPETITION
     {
         m_status = Status::invalidFront;
     }
-    else if(m_ordinalnumber >= z())
+    else if(m_ordinalnumber >= size())
     {
         m_status = Status::invalidBack;
     }
@@ -127,7 +127,7 @@ typename GenericUrn<T,ORDER,REPETITION>::Iterator& GenericUrn<T,ORDER,REPETITION
 {   
     --m_ordinalnumber;
 
-    if(m_ordinalnumber == z()-1)
+    if(m_ordinalnumber == size()-1)
     {  
         m_status = Status::valid;
     }
@@ -135,7 +135,7 @@ typename GenericUrn<T,ORDER,REPETITION>::Iterator& GenericUrn<T,ORDER,REPETITION
     {
         m_status = Status::invalidFront;
     }
-    else if(m_ordinalnumber >= z())
+    else if(m_ordinalnumber >= size())
     {
         m_status = Status::invalidBack;
     }
@@ -238,7 +238,7 @@ typename GenericUrn<T,ORDER,REPETITION>::Iterator::difference_type GenericUrn<T,
 template<typename T, bool ORDER, bool REPETITION>
 typename GenericUrn<T,ORDER,REPETITION>::Iterator::reference GenericUrn<T,ORDER,REPETITION>::Iterator::operator[](typename GenericUrn<T,ORDER,REPETITION>::Iterator::size_type index) const 
 { 
-    if(index >= z() || index < 0)
+    if(index >= size() || index < 0)
     {   
         throw std::domain_error("There is no valid draw for this ordinalnumber.");
     }
@@ -267,9 +267,9 @@ uint GenericUrn<T, ORDER, REPETITION>::k() const
 }
 
 template <typename T,bool ORDER,bool REPETITION>
-uint GenericUrn<T, ORDER, REPETITION>::z() const
+uint GenericUrn<T, ORDER, REPETITION>::size() const
 {
-    return m_urn.z();
+    return m_urn.size();
 }
 
 template <typename T,bool ORDER,bool REPETITION>
@@ -281,7 +281,7 @@ typename GenericUrn<T, ORDER, REPETITION>::Iterator GenericUrn<T, ORDER, REPETIT
 template <typename T,bool ORDER,bool REPETITION>
 typename GenericUrn<T, ORDER, REPETITION>::Iterator GenericUrn<T, ORDER, REPETITION>::end()
 {
-    return Iterator(this,z(),Iterator::Status::invalidBack);
+    return Iterator(this,size(),Iterator::Status::invalidBack);
 }
 
 template <typename T,bool ORDER,bool REPETITION>
