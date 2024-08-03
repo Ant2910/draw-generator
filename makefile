@@ -21,13 +21,17 @@ all: $(OBJDIR)/Benchmark
 $(OBJDIR)/urn.o: $(SRCDIR)/urn.cpp $(SRCDIR)/urn.hpp
 	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/urn.o -c $(SRCDIR)/urn.cpp
 
+#Rule7: Generate object code for urn_old.cpp
+$(OBJDIR)/urn_old.o: $(SRCDIR)/urn_old.cpp $(SRCDIR)/urn_old.hpp
+	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/urn_old.o -c $(SRCDIR)/urn_old.cpp
+
 #Rule3: Generate object code for Benchmark.cpp
-$(OBJDIR)/Benchmark.o: $(SRCDIR)/Benchmark.cpp $(SRCDIR)/urn.hpp
+$(OBJDIR)/Benchmark.o: $(SRCDIR)/Benchmark.cpp $(SRCDIR)/urn.hpp $(SRCDIR)/urn_old.hpp
 	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/Benchmark.o -c $(SRCDIR)/Benchmark.cpp
 
 #Rule5: Generate executable for Benchmark
-$(OBJDIR)/Benchmark: $(OBJDIR)/Benchmark.o $(OBJDIR)/urn.o
-	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/Benchmark $(OBJDIR)/Benchmark.o $(OBJDIR)/urn.o
+$(OBJDIR)/Benchmark: $(OBJDIR)/Benchmark.o $(OBJDIR)/urn.o $(OBJDIR)/urn_old.o
+	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/Benchmark $(OBJDIR)/Benchmark.o $(OBJDIR)/urn.o $(OBJDIR)/urn_old.o
 
 .PHONY: clean
 #Rule 6: Delete all files and subdirectories
