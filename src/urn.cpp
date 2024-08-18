@@ -28,9 +28,9 @@ namespace urn
 
     //Helper functions
     
-    uint factorial(const uint& n)
+    unsigned long long factorial(const uint& n)
     {   
-        uint result {1};
+        unsigned long long result {1};
         for(uint nCount {n}; nCount >= 1; --nCount)
         {
             result *= nCount;

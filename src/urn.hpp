@@ -46,7 +46,7 @@ namespace urn
      * \brief Helper function for calculating the faculty.
      * \return Faculty of n of type uint.
      */
-    uint factorial(const uint& n);
+    unsigned long long factorial(const uint& n);
 
     /*!
      * \class UrnOR – urn where the order is important and which contains repetitions.

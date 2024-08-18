@@ -26,7 +26,7 @@ $(OBJDIR)/urn_old.o: $(SRCDIR)/urn_old.cpp $(SRCDIR)/urn_old.hpp
 	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/urn_old.o -c $(SRCDIR)/urn_old.cpp
 
 #Rule3: Generate object code for Benchmark.cpp
-$(OBJDIR)/Benchmark.o: $(SRCDIR)/Benchmark.cpp $(SRCDIR)/urn.hpp $(SRCDIR)/urn_old.hpp
+$(OBJDIR)/Benchmark.o: $(SRCDIR)/Benchmark.cpp $(SRCDIR)/urn.hpp $(SRCDIR)/urn_old.hpp $(SRCDIR)/Benchmark_Config.hpp
 	$(CXX) $(CXXFLAGS) -o $(OBJDIR)/Benchmark.o -c $(SRCDIR)/Benchmark.cpp
 
 #Rule5: Generate executable for Benchmark
