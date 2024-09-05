@@ -11,10 +11,10 @@ Benchmark soll nicht enthalten sein => 0
 #define URN_O_SPECIFIC_DRAW 0
 
 #define URN_OR_FULL_ITERATION 0
-#define URN_OR_SPECIFIC_DRAW 0
+#define URN_OR_SPECIFIC_DRAW 1
 
-#define URN_R_FULL_ITERATION 0
-#define URN_R_SPECIFIC_DRAW 1
+#define URN_R_FULL_ITERATION 1
+#define URN_R_SPECIFIC_DRAW 0
 
 #define URN_FULL_ITERATION 0
 #define URN_SPECIFIC_DRAW 0

@@ -68,7 +68,7 @@ namespace na
 //TEST_FUNCTIONS
 void full_iteration_new_UrnO(const auto& begin, const auto& end)
 {
-    for(auto it {begin}; it != end; ++it);
+    for(auto it {begin}; it != end; ++it){*it;};
 }
 
 void full_iteration_old_UrnO(auto urn)
@@ -81,7 +81,7 @@ void full_iteration_next_permutation(const auto& begin, const auto& end)
     do {} while (std::next_permutation(begin, end));
 }
 
-TEST_CASE("Full iteration small")
+TEST_CASE("Full iteration small UrnO")
 {
     BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
     {
@@ -102,7 +102,7 @@ TEST_CASE("Full iteration small")
     };
 }
 
-TEST_CASE("Full iteration mid")
+TEST_CASE("Full iteration mid UrnO")
 {
     BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
     {
@@ -123,7 +123,7 @@ TEST_CASE("Full iteration mid")
     };
 }
 
-TEST_CASE("Full iteration big")
+TEST_CASE("Full iteration big UrnO")
 {
     BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
     {
@@ -175,7 +175,7 @@ void specific_draw_next_permutation(const auto& begin, const auto& end, const ui
     }
 }
 
-TEST_CASE("Specific draw small")
+TEST_CASE("Specific draw small UrnO")
 {
     BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
     {
@@ -196,7 +196,7 @@ TEST_CASE("Specific draw small")
     };
 }
 
-TEST_CASE("Specific draw mid")
+TEST_CASE("Specific draw mid UrnO")
 {
     BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
     {
@@ -217,7 +217,7 @@ TEST_CASE("Specific draw mid")
     };
 }
 
-TEST_CASE("Specific draw big")
+TEST_CASE("Specific draw big UrnO")
 {
     BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
     {
@@ -251,7 +251,7 @@ TEST_CASE("Specific draw big")
 //TEST_FUNCTIONS
 void full_iteration_new_UrnOR(const auto& begin, const auto& end)
 {
-    for(auto it {begin}; it != end; ++it);
+    for(auto it {begin}; it != end; ++it){*it;};
 }
 
 void full_iteration_old_UrnOR(auto urn)
@@ -264,7 +264,7 @@ void full_iteration_naive_approach_UrnOR(std::vector<uint> draw, const auto& n, 
     do {} while (na::increment_draw(draw,n,k));
 }
 
-TEST_CASE("Full iteration small")
+TEST_CASE("Full iteration small UrnOR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
@@ -285,7 +285,7 @@ TEST_CASE("Full iteration small")
     };
 }
 
-TEST_CASE("Full iteration mid")
+TEST_CASE("Full iteration mid UrnOR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
@@ -306,7 +306,7 @@ TEST_CASE("Full iteration mid")
     };
 }
 
-TEST_CASE("Full iteration big")
+TEST_CASE("Full iteration big UrnOR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
@@ -358,7 +358,7 @@ void specific_draw_naive_approach_UrnOR(auto draw, const uint& n, const uint& k,
     }
 }
 
-TEST_CASE("Specific draw small")
+TEST_CASE("Specific draw small UrnOR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
@@ -379,7 +379,7 @@ TEST_CASE("Specific draw small")
     };
 }
 
-TEST_CASE("Specific draw mid")
+TEST_CASE("Specific draw mid UrnOR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
@@ -400,24 +400,24 @@ TEST_CASE("Specific draw mid")
     };
 }
 
-TEST_CASE("Specific draw big")
+TEST_CASE("Specific draw big UrnOR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
-        urn_old::UrnOR u {6,6};
-        meter.measure([&u] { return specific_draw_old_UrnOR(u,46655); });
+        urn_old::UrnOR u {7,7};
+        meter.measure([&u] { return specific_draw_old_UrnOR(u,823542); });
     };
 
     BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
-        urn::UrnOR u {6,6};
-        meter.measure([&u] { return specific_draw_new_UrnOR(u,46655); });
+        urn::UrnOR u {7,7};
+        meter.measure([&u] { return specific_draw_new_UrnOR(u,823542); });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
-        std::vector<uint> v (6,0);
-        meter.measure([&v] { return specific_draw_naive_approach_UrnOR(v,6,6,46655); });
+        std::vector<uint> v (7,0);
+        meter.measure([&v] { return specific_draw_naive_approach_UrnOR(v,7,7,823542); });
     };
 }
 #endif //URN_OR_SPECIFIC_DRAW_ENABLED
@@ -434,7 +434,7 @@ TEST_CASE("Specific draw big")
 //TEST_FUNCTIONS
 void full_iteration_new_UrnR(const auto& begin, const auto& end)
 {
-    for(auto it {begin}; it != end; ++it);
+    for(auto it {begin}; it != end; ++it){*it;};
 }
 
 void full_iteration_old_UrnR(auto urn)
@@ -451,7 +451,7 @@ void full_iteration_naive_approach_UrnR(auto draw, const auto& n, const auto& k)
     } while (na::increment_draw(draw,n,k));
 }
 
-TEST_CASE("Full iteration small")
+TEST_CASE("Full iteration small UrnR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
@@ -472,7 +472,7 @@ TEST_CASE("Full iteration small")
     };
 }
 
-TEST_CASE("Full iteration mid")
+TEST_CASE("Full iteration mid UrnR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
@@ -493,23 +493,23 @@ TEST_CASE("Full iteration mid")
     };
 }
 
-TEST_CASE("Full iteration big")
+TEST_CASE("Full iteration big UrnR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
-        urn_old::UrnR u {7,7};
+        urn_old::UrnR u {6,6};
         meter.measure([&u] { return full_iteration_old_UrnR(u); });
     };
 
     BENCHMARK_ADVANCED("urn::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
-        urn::UrnR u {7,7};
+        urn::UrnR u {6,6};
         meter.measure([&u] { return full_iteration_new_UrnR(u.begin(), u.end()); });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
-        std::vector<uint> v (7,0);
+        std::vector<uint> v (6,6);
         meter.measure([&v] { return full_iteration_naive_approach_UrnR(v,7,7); });
     };
 }
@@ -552,7 +552,7 @@ void specific_draw_naive_approach_UrnR(auto draw, const uint& n, const uint& k, 
     }
 }
 
-TEST_CASE("Specific draw small")
+TEST_CASE("Specific draw small UrnR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
@@ -573,7 +573,7 @@ TEST_CASE("Specific draw small")
     };
 }
 
-TEST_CASE("Specific draw mid")
+TEST_CASE("Specific draw mid UrnR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
@@ -594,7 +594,7 @@ TEST_CASE("Specific draw mid")
     };
 }
 
-TEST_CASE("Specific draw big")
+TEST_CASE("Specific draw big UrnR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
@@ -629,7 +629,7 @@ TEST_CASE("Specific draw big")
 //TEST_FUNCTIONS
 void full_iteration_new_Urn(const auto& begin, const auto& end)
 {
-    for(auto it {begin}; it != end; ++it);
+    for(auto it {begin}; it != end; ++it){*it;};
 }
 
 void full_iteration_old_Urn(auto urn)
@@ -646,7 +646,7 @@ void full_iteration_naive_approach_Urn(auto draw, const auto& n, const auto& k)
     } while (na::increment_draw(draw,n,k));
 }
 
-TEST_CASE("Full iteration small")
+TEST_CASE("Full iteration small Urn")
 {
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
@@ -667,7 +667,7 @@ TEST_CASE("Full iteration small")
     };
 }
 
-TEST_CASE("Full iteration mid")
+TEST_CASE("Full iteration mid Urn")
 {
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
@@ -688,7 +688,7 @@ TEST_CASE("Full iteration mid")
     };
 }
 
-TEST_CASE("Full iteration big")
+TEST_CASE("Full iteration big Urn")
 {
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
@@ -747,7 +747,7 @@ void specific_draw_naive_approach_Urn(auto draw, const uint& n, const uint& k, c
     }
 }
 
-TEST_CASE("Specific draw small")
+TEST_CASE("Specific draw small Urn")
 {
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
@@ -768,7 +768,7 @@ TEST_CASE("Specific draw small")
     };
 }
 
-TEST_CASE("Specific draw mid")
+TEST_CASE("Specific draw mid Urn")
 {
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
@@ -789,7 +789,7 @@ TEST_CASE("Specific draw mid")
     };
 }
 
-TEST_CASE("Specific draw big")
+TEST_CASE("Specific draw big Urn")
 {
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
@@ -814,66 +814,34 @@ TEST_CASE("Specific draw big")
 
 
 
-
 /*
-void specific_draw_new_Urn(auto urn, const uint& specificDraw)
-{   
-    std::vector<uint> v = urn.draw(specificDraw);
-
-    for(auto i: v)
-        std::cout << i;
-    std::cout << std::endl;
-}
-
-void specific_draw_old_Urn(auto urn, const uint& specificDraw)
-{   
-    for(int upCount {}; upCount < specificDraw; ++upCount)
-    {
-        std::ignore = urn.next();
-        //https://en.cppreference.com/w/cpp/utility/tuple/ignore könnte es verlangsamen?
-    }
-
-    for(uint i {}; i < urn.k(); ++i)
-        std::cout << urn[i];
-    std::cout << std::endl;
-}
-
-void specific_draw_naive_approach_Urn(auto draw, const uint& n, const uint& k, const uint& specificDraw)
-{   
-    int upCount {-1}; //weil bei 0 wäre es 000
-                      //muss bei UrnR nicht beachtet werden, weil da reps erlaubt
-    while(upCount != specificDraw)
+void full_iteration_new_UrnR(const auto& begin, const auto& end)
+{
+    for(auto it {begin}; it != end; ++it)
     {   
-        na::increment_draw(draw,n,k);
-
-        if(!na::unsorted(draw,k) && !na::repetitions(draw,k))
-        {
-            ++upCount;
-        }
-    }
-
-    for(auto i: draw)
-        std::cout << i;
-    std::cout << std::endl;
+        for(auto i: *it)
+            std::cout << i;
+        std::cout << std::endl;
+    };
 }
 
+void full_iteration_old_UrnR(auto urn)
+{   
+    do {
+        for(int i{}; i < urn.k(); ++i)
+            std::cout << urn[i];
+        std::cout << std::endl;
+    } while (urn.next());
+}
 
 
 int main()
 {   
     
-    std::cout << "Urn new" << std::endl;
-    urn::Urn u {4,2};
-    specific_draw_new_Urn(u,3);
-
-    std::cout << "Urn old" << std::endl;
-    urn_old::Urn ur {4,2};
-    specific_draw_old_Urn(ur,3);
-
-    std::cout << "Urn naive approach" << std::endl;
-    std::vector<uint> v {0,0,0,0};
-    specific_draw_naive_approach_Urn(v,4,2,3);
+    urn::Urn u {9,5};
     
+    full_iteration_old_UrnR(u);
+    full_iteration_new_UrnR(u.begin(),u.end());
 
     return 0;
 }
