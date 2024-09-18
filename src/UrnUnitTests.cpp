@@ -1,10 +1,11 @@
 //UrnUnitTests.cpp by Anton Hempel, Ulrich Eisenecker, March 20, 2024
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
+//#define CATCH_CONFIG_MAIN
+#include <catch2/catch_all.hpp> 
 #include "urn.hpp"
 #include <string>
 #include <concepts>
+#include <ranges>
 using namespace urn;
 
 template<class T>

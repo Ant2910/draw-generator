@@ -1,12 +1,12 @@
-//Benchmark.cpp by Anton Hempel, August 08, 2024
+//Benchmark.cpp by Anton Hempel, September 06, 2024
 
-#define CATCH_CONFIG_MAIN
-#define CATCH_CONFIG_ENABLE_BENCHMARKING
-
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp> 
 #include "urn.hpp"
 #include "urn_old.hpp"
 #include <algorithm>
+#include <random>
+#include <vector>
+#include <discreture.hpp> //https://github.com/mraggi/discreture (Andere Permutation und Kombinatorik Bib)
 #include "Benchmark_Config.hpp"
 
 
@@ -56,189 +56,31 @@ namespace na
             {
                 draw[posCount-1] = 0;
             }
+        }
+        return false;
     }
-    return false;
+
+
+    bool decrement_draw(std::vector<uint>& draw, const uint& n, const uint& k)
+    {   
+        for(uint posCount {k}; posCount > 0; --posCount)
+        {
+            if(draw[posCount-1] > 0)
+            {
+                --draw[posCount-1];
+
+                return true;
+            }
+            else
+            {
+                draw[posCount-1] = n-1;
+            }
+        }
+        return false;
     }
+
 }
 
-
-
-//ORDER IMPORTANT, NO REPETITION BEGIN
-#ifdef URN_O_FULL_ITERATION_ENABLED
-//TEST_FUNCTIONS
-void full_iteration_new_UrnO(const auto& begin, const auto& end)
-{
-    for(auto it {begin}; it != end; ++it){*it;};
-}
-
-void full_iteration_old_UrnO(auto urn)
-{   
-    do {} while (urn.next());
-}
-
-void full_iteration_next_permutation(const auto& begin, const auto& end)
-{   
-    do {} while (std::next_permutation(begin, end));
-}
-
-TEST_CASE("Full iteration small UrnO")
-{
-    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn_old::UrnO u {3,3};
-        meter.measure([&u] { return full_iteration_old_UrnO(u); });
-    };
-
-    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn::UrnO u {3,3};
-        meter.measure([&u] { return full_iteration_new_UrnO(u.begin(), u.end()); });
-    };
-
-    BENCHMARK_ADVANCED("std::next_permutation")(Catch::Benchmark::Chronometer meter) 
-    {
-        std::vector<uint> v {0,1,2};
-        meter.measure([&v] { return full_iteration_next_permutation(v.begin(), v.end()); });
-    };
-}
-
-TEST_CASE("Full iteration mid UrnO")
-{
-    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn_old::UrnO u {5,5};
-        meter.measure([&u] { return full_iteration_old_UrnO(u); });
-    };
-
-    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn::UrnO u {5,5};
-        meter.measure([&u] { return full_iteration_new_UrnO(u.begin(), u.end()); });
-    };
-
-    BENCHMARK_ADVANCED("std::next_permutation")(Catch::Benchmark::Chronometer meter) 
-    {
-        std::vector<uint> v {0,1,2,3,4};
-        meter.measure([&v] { return full_iteration_next_permutation(v.begin(), v.end()); });
-    };
-}
-
-TEST_CASE("Full iteration big UrnO")
-{
-    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn_old::UrnO u {7,7};
-        meter.measure([&u] { return full_iteration_old_UrnO(u); });
-    };
-
-    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn::UrnO u {7,7};
-        meter.measure([&u] { return full_iteration_new_UrnO(u.begin(), u.end()); });
-    };
-
-    BENCHMARK_ADVANCED("std::next_permutation")(Catch::Benchmark::Chronometer meter) 
-    {
-        std::vector<uint> v {0,1,2,3,4,5,6};
-        meter.measure([&v] { return full_iteration_next_permutation(v.begin(), v.end()); });
-    };
-}
-#endif //URN_O_FULL_ITERATION
-
-
-
-
-
-
-
-#ifdef URN_O_SPECIFIC_DRAW_ENABLED
-//TEST_FUNCTIONS
-void specific_draw_new_UrnO(auto urn, const uint& specificDraw)
-{
-    urn.draw(specificDraw);
-}
-
-void specific_draw_old_UrnO(auto urn, const uint& specificDraw)
-{   
-    for(int upCount {}; upCount < specificDraw; ++upCount)
-    {
-        std::ignore = urn.next();
-        //https://en.cppreference.com/w/cpp/utility/tuple/ignore könnte es verlangsamen?
-    }
-}
-
-void specific_draw_next_permutation(const auto& begin, const auto& end, const uint& specificDraw)
-{   
-    for(int upCount {}; upCount < specificDraw; ++upCount)
-    {
-        std::next_permutation(begin, end);
-    }
-}
-
-TEST_CASE("Specific draw small UrnO")
-{
-    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn_old::UrnO u {3,3};
-        meter.measure([&u] { return specific_draw_old_UrnO(u,5); });
-    };
-
-    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn::UrnO u {3,3};
-        meter.measure([&u] { return specific_draw_new_UrnO(u,5); });
-    };
-
-    BENCHMARK_ADVANCED("std::next_permutation")(Catch::Benchmark::Chronometer meter) 
-    {
-        std::vector<uint> v {0,1,2};
-        meter.measure([&v] { return specific_draw_next_permutation(v.begin(), v.end(),5); });
-    };
-}
-
-TEST_CASE("Specific draw mid UrnO")
-{
-    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn_old::UrnO u {5,5};
-        meter.measure([&u] { return specific_draw_old_UrnO(u,119); });
-    };
-
-    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn::UrnO u {5,5};
-        meter.measure([&u] { return specific_draw_new_UrnO(u,119); });
-    };
-
-    BENCHMARK_ADVANCED("std::next_permutation")(Catch::Benchmark::Chronometer meter) 
-    {
-        std::vector<uint> v {0,1,2,3,4};
-        meter.measure([&v] { return specific_draw_next_permutation(v.begin(), v.end(), 119); });
-    };
-}
-
-TEST_CASE("Specific draw big UrnO")
-{
-    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn_old::UrnO u {7,7};
-        meter.measure([&u] { return specific_draw_old_UrnO(u,5039); });
-    };
-
-    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
-    {
-        urn::UrnO u {7,7};
-        meter.measure([&u] { return specific_draw_new_UrnO(u,5039); });
-    };
-
-    BENCHMARK_ADVANCED("std::next_permutation")(Catch::Benchmark::Chronometer meter) 
-    {
-        std::vector<uint> v {0,1,2,3,4,5,6};
-        meter.measure([&v] { return specific_draw_next_permutation(v.begin(), v.end(), 5039); });
-    };
-}
-#endif //URN_O_SPECIFIC_DRAW
-//ORDER IMPORTANT, NO REPETITION END
 
 
 
@@ -247,86 +89,150 @@ TEST_CASE("Specific draw big UrnO")
 
 
 //ORDER IMPORTANT, REPETITION IMPORTANT BEGIN
-#ifdef URN_OR_FULL_ITERATION_ENABLED
+#ifdef URN_OR_FULL_ITERATION_FORWARD_ENABLED
 //TEST_FUNCTIONS
-void full_iteration_new_UrnOR(const auto& begin, const auto& end)
+void full_iteration_forward_new_UrnOR(const auto& begin, const auto& end)
 {
     for(auto it {begin}; it != end; ++it){*it;};
 }
 
-void full_iteration_old_UrnOR(auto urn)
+void full_iteration_forward_old_UrnOR(auto urn)
 {   
     do {} while (urn.next());
 }
 
-void full_iteration_naive_approach_UrnOR(std::vector<uint> draw, const auto& n, const auto& k)
+void full_iteration_forward_naive_approach_UrnOR(std::vector<uint> draw, const auto& n, const auto& k)
 {   
     do {} while (na::increment_draw(draw,n,k));
 }
 
-TEST_CASE("Full iteration small UrnOR")
+TEST_CASE("Full forward iteration small UrnOR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnOR u {3,3};
-        meter.measure([&u] { return full_iteration_old_UrnOR(u); });
+        meter.measure([&u] { return full_iteration_forward_old_UrnOR(u); });
     };
 
     BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
         urn::UrnOR u {3,3};
-        meter.measure([&u] { return full_iteration_new_UrnOR(u.begin(), u.end()); });
+        meter.measure([&u] { return full_iteration_forward_new_UrnOR(u.begin(), u.end()); });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (3,0);
-        meter.measure([&v] { return full_iteration_naive_approach_UrnOR(v,3,3); });
+        meter.measure([&v] { return full_iteration_forward_naive_approach_UrnOR(v,3,3); });
     };
 }
 
-TEST_CASE("Full iteration mid UrnOR")
+TEST_CASE("Full forward iteration mid UrnOR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnOR u {5,5};
-        meter.measure([&u] { return full_iteration_old_UrnOR(u); });
+        meter.measure([&u] { return full_iteration_forward_old_UrnOR(u); });
     };
 
     BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
         urn::UrnOR u {5,5};
-        meter.measure([&u] { return full_iteration_new_UrnOR(u.begin(), u.end()); });
+        meter.measure([&u] { return full_iteration_forward_new_UrnOR(u.begin(), u.end()); });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (5,0);
-        meter.measure([&v] { return full_iteration_naive_approach_UrnOR(v,5,5); });
+        meter.measure([&v] { return full_iteration_forward_naive_approach_UrnOR(v,5,5); });
     };
 }
 
-TEST_CASE("Full iteration big UrnOR")
+TEST_CASE("Full forward iteration big UrnOR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnOR u {7,7};
-        meter.measure([&u] { return full_iteration_old_UrnOR(u); });
+        meter.measure([&u] { return full_iteration_forward_old_UrnOR(u); });
     };
 
     BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
         urn::UrnOR u {7,7};
-        meter.measure([&u] { return full_iteration_new_UrnOR(u.begin(), u.end()); });
+        meter.measure([&u] { return full_iteration_forward_new_UrnOR(u.begin(), u.end()); });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (7,0);
-        meter.measure([&v] { return full_iteration_naive_approach_UrnOR(v,7,7); });
+        meter.measure([&v] { return full_iteration_forward_naive_approach_UrnOR(v,7,7); });
     };
 }
-#endif //URN_OR_FULL_ITERATION
+#endif //URN_OR_FULL_ITERATION_FORWARD_ENABLED
+
+
+
+
+
+
+
+#ifdef URN_OR_FULL_ITERATION_BACKWARD_ENABLED
+//TEST_FUNCTIONS
+void full_iteration_backward_new_UrnOR(const auto& begin, const auto& end)
+{
+    for(auto it {begin}; it != end; ++it){*it;}
+}
+
+void full_iteration_backward_naive_approach_UrnOR(std::vector<uint> draw, const auto& n, const auto& k)
+{   
+    do {} while (na::decrement_draw(draw,n,k));
+}
+
+TEST_CASE("Full backward iteration small UrnOR")
+{
+    BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnOR u {3,3};
+        meter.measure([&u] { return full_iteration_backward_new_UrnOR(u.rbegin(), u.rend()); });
+    };
+
+    BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v (3,2);
+        meter.measure([&v] { return full_iteration_backward_naive_approach_UrnOR(v,3,3); });
+    };
+}
+
+TEST_CASE("Full backward iteration mid UrnOR")
+{
+    BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnOR u {5,5};
+        meter.measure([&u] { return full_iteration_backward_new_UrnOR(u.rbegin(), u.rend()); });
+    };
+
+    BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v (5,4);
+        meter.measure([&v] { return full_iteration_backward_naive_approach_UrnOR(v,5,5); });
+    };
+}
+
+TEST_CASE("Full backward iteration big UrnOR")
+{
+    BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnOR u {7,7};
+        meter.measure([&u] { return full_iteration_backward_new_UrnOR(u.rbegin(), u.rend()); });
+    };
+
+    BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v (7,6);
+        meter.measure([&v] { return full_iteration_backward_naive_approach_UrnOR(v,7,7); });
+    };
+}
+#endif //URN_OR_FULL_ITERATION_BACKWARD_ENABLED
 
 
 
@@ -363,19 +269,52 @@ TEST_CASE("Specific draw small UrnOR")
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnOR u {3,3};
-        meter.measure([&u] { return specific_draw_old_UrnOR(u,26); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,26);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_UrnOR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
-    {
+    {   
         urn::UrnOR u {3,3};
-        meter.measure([&u] { return specific_draw_new_UrnOR(u,26); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,26);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_UrnOR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (3,0);
-        meter.measure([&v] { return specific_draw_naive_approach_UrnOR(v,3,3,26); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,26);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_naive_approach_UrnOR(v,3,3,randomDraw); 
+        });
     };
 }
 
@@ -384,19 +323,52 @@ TEST_CASE("Specific draw mid UrnOR")
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnOR u {5,5};
-        meter.measure([&u] { return specific_draw_old_UrnOR(u,3124); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,3124);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_UrnOR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
         urn::UrnOR u {5,5};
-        meter.measure([&u] { return specific_draw_new_UrnOR(u,3124); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,3124);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_UrnOR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (5,0);
-        meter.measure([&v] { return specific_draw_naive_approach_UrnOR(v,5,5,3124); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,3124);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_naive_approach_UrnOR(v,5,5,randomDraw); 
+        });
     };
 }
 
@@ -405,19 +377,52 @@ TEST_CASE("Specific draw big UrnOR")
     BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnOR u {7,7};
-        meter.measure([&u] { return specific_draw_old_UrnOR(u,823542); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,823542);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_UrnOR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
     {
         urn::UrnOR u {7,7};
-        meter.measure([&u] { return specific_draw_new_UrnOR(u,823542); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,823542);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_UrnOR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (7,0);
-        meter.measure([&v] { return specific_draw_naive_approach_UrnOR(v,7,7,823542); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,823542);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_naive_approach_UrnOR(v,7,7,randomDraw); 
+        });
     };
 }
 #endif //URN_OR_SPECIFIC_DRAW_ENABLED
@@ -429,20 +434,483 @@ TEST_CASE("Specific draw big UrnOR")
 
 
 
-//ORDER NOT IMPORTANT, REPETITION IMPORTANT BEGIN
-#ifdef URN_R_FULL_ITERATION_ENABLED
+//ORDER IMPORTANT, NO REPETITION BEGIN
+#ifdef URN_O_FULL_ITERATION_FORWARD_ENABLED
 //TEST_FUNCTIONS
-void full_iteration_new_UrnR(const auto& begin, const auto& end)
+void full_iteration_forward_new_UrnO(const auto& begin, const auto& end)
 {
     for(auto it {begin}; it != end; ++it){*it;};
 }
 
-void full_iteration_old_UrnR(auto urn)
+void full_iteration_forward_old_UrnO(auto urn)
 {   
     do {} while (urn.next());
 }
 
-void full_iteration_naive_approach_UrnR(auto draw, const auto& n, const auto& k)
+void full_iteration_forward_next_permutation(std::vector<uint> draw)
+{   
+    auto begin {draw.begin()};
+    auto end {draw.end()};
+
+    do {} while (std::next_permutation(begin, end));
+}
+
+void full_iteration_forward_discreture_permutations(const int& n)
+{
+    for (const auto& perm : discreture::permutations(n));
+}
+
+TEST_CASE("Full forward iteration small UrnO")
+{
+    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn_old::UrnO u {3,3};
+        meter.measure([&u] { return full_iteration_forward_old_UrnO(u); });
+    };
+
+    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnO u {3,3};
+        meter.measure([&u] { return full_iteration_forward_new_UrnO(u.begin(), u.end()); });
+    };
+
+    BENCHMARK_ADVANCED("std::next_permutation")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {0,1,2};
+        meter.measure([&v] { return full_iteration_forward_next_permutation(v); });
+    };
+
+    //Kann nur Permutationen mit gleichen n und k
+    BENCHMARK_ADVANCED("discreture::permutations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_iteration_forward_discreture_permutations(3); });
+    };
+}
+
+TEST_CASE("Full forward iteration mid UrnO")
+{
+    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn_old::UrnO u {5,5};
+        meter.measure([&u] { return full_iteration_forward_old_UrnO(u); });
+    };
+
+    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnO u {5,5};
+        meter.measure([&u] { return full_iteration_forward_new_UrnO(u.begin(), u.end()); });
+    };
+
+    BENCHMARK_ADVANCED("std::next_permutation")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {0,1,2,3,4};
+        meter.measure([&v] { return full_iteration_forward_next_permutation(v); });
+    };
+
+    //Kann nur Permutationen mit gleichen n und k
+    BENCHMARK_ADVANCED("discreture::permutations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_iteration_forward_discreture_permutations(5); });
+    };
+}
+
+TEST_CASE("Full forward iteration big UrnO")
+{
+    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn_old::UrnO u {7,7};
+        meter.measure([&u] { return full_iteration_forward_old_UrnO(u); });
+    };
+
+    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnO u {7,7};
+        meter.measure([&u] { return full_iteration_forward_new_UrnO(u.begin(), u.end()); });
+    };
+
+    BENCHMARK_ADVANCED("std::next_permutation")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {0,1,2,3,4,5,6};
+        meter.measure([&v] { return full_iteration_forward_next_permutation(v); });
+    };
+
+    //Kann nur Permutationen mit gleichen n und k
+    BENCHMARK_ADVANCED("discreture::permutations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_iteration_forward_discreture_permutations(7); });
+    };
+}
+#endif //URN_O_FULL_ITERATION_FORWARD_ENABLED
+
+
+
+
+
+
+
+#ifdef URN_O_FULL_ITERATION_BACKWARD_ENABLED
+//TEST_FUNCTIONS
+void full_iteration_backward_new_UrnO(const auto& begin, const auto& end)
+{
+    for(auto it {begin}; it != end; ++it){*it;}
+}
+
+void full_iteration_backward_prev_permutation(std::vector<uint> draw)
+{   
+    auto begin {draw.begin()};
+    auto end {draw.end()};
+
+    do {} while (std::prev_permutation(begin, end));
+}
+
+void full_iteration_backward_discreture_permutations(const int& n)
+{   
+    for (const auto& perm : reversed(discreture::permutations(n)));
+}
+
+TEST_CASE("Full backward iteration small UrnO")
+{
+    BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnO u {3,3};
+        meter.measure([&u] { return full_iteration_backward_new_UrnO(u.rbegin(), u.rend()); });
+    };
+
+    BENCHMARK_ADVANCED("std::prev_permutation")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {2,1,0};
+        meter.measure([&v] { return full_iteration_backward_prev_permutation(v); });
+    };
+
+    //Kann nur Permutationen mit gleichen n und k
+    BENCHMARK_ADVANCED("discreture::permutations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_iteration_backward_discreture_permutations(3); });
+    };
+}
+
+TEST_CASE("Full backward iteration mid UrnO")
+{
+    BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnO u {5,5};
+        meter.measure([&u] { return full_iteration_backward_new_UrnO(u.rbegin(), u.rend()); });
+    };
+
+    BENCHMARK_ADVANCED("std::prev_permutation")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {4,3,2,1,0};
+        meter.measure([&v] { return full_iteration_backward_prev_permutation(v); });
+    };
+
+    //Kann nur Permutationen mit gleichen n und k
+    BENCHMARK_ADVANCED("discreture::permutations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_iteration_backward_discreture_permutations(5); });
+    };
+}
+
+TEST_CASE("Full backward iteration big UrnO")
+{
+    BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnO u {7,7};
+        meter.measure([&u] { return full_iteration_backward_new_UrnO(u.rbegin(), u.rend()); });
+    };
+
+    BENCHMARK_ADVANCED("std::prev_permutation")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {6,5,4,3,2,1,0};
+        meter.measure([&v] { return full_iteration_backward_prev_permutation(v); });
+    };
+
+    //Kann nur Permutationen mit gleichen n und k
+    BENCHMARK_ADVANCED("discreture::permutations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_iteration_backward_discreture_permutations(7); });
+    };
+}
+#endif //URN_O_FULL_ITERATION_BACKWARD_ENABLED
+
+
+
+
+
+
+
+#ifdef URN_O_SPECIFIC_DRAW_ENABLED
+//TEST_FUNCTIONS
+void specific_draw_new_UrnO(auto urn, const uint& specificDraw)
+{
+    urn.draw(specificDraw);
+}
+
+void specific_draw_old_UrnO(auto urn, const uint& specificDraw)
+{   
+    for(int upCount {}; upCount < specificDraw; ++upCount)
+    {
+        std::ignore = urn.next();
+        //https://en.cppreference.com/w/cpp/utility/tuple/ignore könnte es verlangsamen?
+    }
+}
+
+void specific_draw_next_permutation(std::vector<uint> draw, const uint& specificDraw)
+{   
+    auto begin {draw.begin()};
+    auto end {draw.end()};
+
+    for(int upCount {}; upCount < specificDraw; ++upCount)
+    {
+        std::next_permutation(begin, end);
+    }
+}
+
+void specific_draw_discreture_permutations(const int& n, const uint& specificDraw)
+{   
+    uint upCount {};
+
+    for (const auto& perm : discreture::permutations(n))
+    {
+        if(upCount == specificDraw)
+        {
+            break;
+        }
+        ++upCount;
+    }
+}
+
+TEST_CASE("Specific draw small UrnO")
+{
+    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn_old::UrnO u {3,3};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_UrnO(u,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnO u {3,3};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_UrnO(u,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("std::next:permutation")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {0,1,2};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_next_permutation(v,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("discreture::permutations")(Catch::Benchmark::Chronometer meter) 
+    {
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5);
+
+        meter.measure([&gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_discreture_permutations(3,randomDraw); 
+        });
+    };
+}
+
+TEST_CASE("Specific draw mid UrnO")
+{
+    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn_old::UrnO u {5,5};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,119);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_UrnO(u,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnO u {5,5};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,119);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_UrnO(u,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("std::next:permutation")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {0,1,2,3,4};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,119);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_next_permutation(v,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("discreture::permutations")(Catch::Benchmark::Chronometer meter) 
+    {
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,119);
+
+        meter.measure([&gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_discreture_permutations(5,randomDraw); 
+        });
+    };
+}
+
+TEST_CASE("Specific draw big UrnO")
+{
+    BENCHMARK_ADVANCED("urn_old::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn_old::UrnO u {7,7};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5039);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_UrnO(u,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("urn::UrnO")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnO u {7,7};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5039);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_UrnO(u,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("std::next:permutation")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {0,1,2,3,4,5,6};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5039);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_next_permutation(v,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("discreture::permutations")(Catch::Benchmark::Chronometer meter) 
+    {
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5039);
+
+        meter.measure([&gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_discreture_permutations(7,randomDraw); 
+        });
+    };
+}
+#endif //URN_O_SPECIFIC_DRAW_ENABLED
+//ORDER IMPORTANT, NO REPETITION END
+
+
+
+
+
+
+
+//ORDER NOT IMPORTANT, REPETITION IMPORTANT BEGIN
+#ifdef URN_R_FULL_ITERATION_FORWARD_ENABLED
+//TEST_FUNCTIONS
+void full_iteration_forward_new_UrnR(const auto& begin, const auto& end)
+{
+    for(auto it {begin}; it != end; ++it){*it;};
+}
+
+void full_iteration_forward_old_UrnR(auto urn)
+{   
+    do {} while (urn.next());
+}
+
+void full_iteration_forward_naive_approach_UrnR(auto draw, const auto& n, const auto& k)
 {   
     do {
 
@@ -451,69 +919,137 @@ void full_iteration_naive_approach_UrnR(auto draw, const auto& n, const auto& k)
     } while (na::increment_draw(draw,n,k));
 }
 
-TEST_CASE("Full iteration small UrnR")
+TEST_CASE("Full forward iteration small UrnR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnR u {3,3};
-        meter.measure([&u] { return full_iteration_old_UrnR(u); });
+        meter.measure([&u] { return full_iteration_forward_old_UrnR(u); });
     };
 
     BENCHMARK_ADVANCED("urn::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
         urn::UrnR u {3,3};
-        meter.measure([&u] { return full_iteration_new_UrnR(u.begin(), u.end()); });
+        meter.measure([&u] { return full_iteration_forward_new_UrnR(u.begin(), u.end()); });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (3,0);
-        meter.measure([&v] { return full_iteration_naive_approach_UrnR(v,3,3); });
+        meter.measure([&v] { return full_iteration_forward_naive_approach_UrnR(v,3,3); });
     };
 }
 
-TEST_CASE("Full iteration mid UrnR")
+TEST_CASE("Full forward iteration mid UrnR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnR u {5,5};
-        meter.measure([&u] { return full_iteration_old_UrnR(u); });
+        meter.measure([&u] { return full_iteration_forward_old_UrnR(u); });
     };
 
     BENCHMARK_ADVANCED("urn::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
         urn::UrnR u {5,5};
-        meter.measure([&u] { return full_iteration_new_UrnR(u.begin(), u.end()); });
+        meter.measure([&u] { return full_iteration_forward_new_UrnR(u.begin(), u.end()); });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (5,0);
-        meter.measure([&v] { return full_iteration_naive_approach_UrnR(v,5,5); });
+        meter.measure([&v] { return full_iteration_forward_naive_approach_UrnR(v,5,5); });
     };
 }
 
-TEST_CASE("Full iteration big UrnR")
+TEST_CASE("Full forward iteration big UrnR")
 {
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnR u {6,6};
-        meter.measure([&u] { return full_iteration_old_UrnR(u); });
+        meter.measure([&u] { return full_iteration_forward_old_UrnR(u); });
     };
 
     BENCHMARK_ADVANCED("urn::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
         urn::UrnR u {6,6};
-        meter.measure([&u] { return full_iteration_new_UrnR(u.begin(), u.end()); });
+        meter.measure([&u] { return full_iteration_forward_new_UrnR(u.begin(), u.end()); });
+    };
+
+    BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v (6,0);
+        meter.measure([&v] { return full_iteration_forward_naive_approach_UrnR(v,6,6); });
+    };
+}
+#endif //URN_R_FULL_ITERATION_FORWARD_ENABLED
+
+
+
+
+
+
+
+#ifdef URN_R_FULL_ITERATION_BACKWARD_ENABLED
+//TEST_FUNCTIONS
+void full_iteration_backward_new_UrnR(const auto& begin, const auto& end)
+{
+    for(auto it {begin}; it != end; ++it){*it;}
+}
+
+void full_iteration_backward_naive_approach_UrnR(std::vector<uint> draw, const auto& n, const auto& k)
+{   
+    do {
+
+        if(!na::unsorted(draw,k));
+
+    } while (na::decrement_draw(draw,n,k));
+}
+
+TEST_CASE("Full backward iteration small UrnR")
+{
+    BENCHMARK_ADVANCED("urn::UrnR")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnR u {3,3};
+        meter.measure([&u] { return full_iteration_backward_new_UrnR(u.rbegin(), u.rend()); });
+    };
+
+    BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v (3,2);
+        meter.measure([&v] { return full_iteration_backward_naive_approach_UrnR(v,3,3); });
+    };
+}
+
+TEST_CASE("Full backward iteration mid UrnR")
+{
+    BENCHMARK_ADVANCED("urn::UrnR")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnR u {5,5};
+        meter.measure([&u] { return full_iteration_backward_new_UrnR(u.rbegin(), u.rend()); });
+    };
+
+    BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v (5,4);
+        meter.measure([&v] { return full_iteration_backward_naive_approach_UrnR(v,5,5); });
+    };
+}
+
+TEST_CASE("Full backward iteration big UrnR")
+{
+    BENCHMARK_ADVANCED("urn::UrnR")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::UrnR u {6,6};
+        meter.measure([&u] { return full_iteration_backward_new_UrnR(u.rbegin(), u.rend()); });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (6,6);
-        meter.measure([&v] { return full_iteration_naive_approach_UrnR(v,7,7); });
+        meter.measure([&v] { return full_iteration_backward_naive_approach_UrnR(v,7,7); });
     };
 }
-#endif //URN_R_FULL_ITERATION
+#endif //URN_R_FULL_ITERATION_BACKWARD_ENABLED
 
 
 
@@ -524,7 +1060,7 @@ TEST_CASE("Full iteration big UrnR")
 #ifdef URN_R_SPECIFIC_DRAW_ENABLED
 //TEST_FUNCTIONS
 void specific_draw_new_UrnR(auto urn, const uint& specificDraw)
-{   
+{
     urn.draw(specificDraw);
 }
 
@@ -557,19 +1093,52 @@ TEST_CASE("Specific draw small UrnR")
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnR u {3,3};
-        meter.measure([&u] { return specific_draw_old_UrnR(u,9); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,9);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_UrnR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("urn::UrnR")(Catch::Benchmark::Chronometer meter) 
-    {
+    {   
         urn::UrnR u {3,3};
-        meter.measure([&u] { return specific_draw_new_UrnR(u,9); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,9);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_UrnR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (3,0);
-        meter.measure([&v] { return specific_draw_naive_approach_UrnR(v,3,3,9); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,9);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_naive_approach_UrnR(v,3,3,randomDraw); 
+        });
     };
 }
 
@@ -578,19 +1147,52 @@ TEST_CASE("Specific draw mid UrnR")
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnR u {5,5};
-        meter.measure([&u] { return specific_draw_old_UrnR(u,125); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,125);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_UrnR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("urn::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
         urn::UrnR u {5,5};
-        meter.measure([&u] { return specific_draw_new_UrnR(u,125); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,125);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_UrnR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (5,0);
-        meter.measure([&v] { return specific_draw_naive_approach_UrnR(v,5,5,125); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,125);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_naive_approach_UrnR(v,5,5,randomDraw); 
+        });
     };
 }
 
@@ -599,19 +1201,52 @@ TEST_CASE("Specific draw big UrnR")
     BENCHMARK_ADVANCED("urn_old::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::UrnR u {7,7};
-        meter.measure([&u] { return specific_draw_old_UrnR(u,1715); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,1715);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_UrnR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("urn::UrnR")(Catch::Benchmark::Chronometer meter) 
     {
         urn::UrnR u {7,7};
-        meter.measure([&u] { return specific_draw_new_UrnR(u,1715); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,1715);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_UrnR(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (7,0);
-        meter.measure([&v] { return specific_draw_naive_approach_UrnR(v,7,7,1715); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,1715);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_naive_approach_UrnR(v,7,7,randomDraw); 
+        });
     };
 }
 #endif //URN_R_SPECIFIC_DRAW_ENABLED
@@ -623,92 +1258,199 @@ TEST_CASE("Specific draw big UrnR")
 
 
 
-
 //ORDER NOT IMPORTANT, NO REPETITION BEGIN
-#ifdef URN_FULL_ITERATION_ENABLED
+#ifdef URN_FULL_ITERATION_FORWARD_ENABLED
 //TEST_FUNCTIONS
-void full_iteration_new_Urn(const auto& begin, const auto& end)
+void full_forward_iteration_new_Urn(const auto& begin, const auto& end)
 {
-    for(auto it {begin}; it != end; ++it){*it;};
+    for(auto it {begin}; it != end; ++it){*it;}
 }
 
-void full_iteration_old_Urn(auto urn)
+void full_forward_iteration_old_Urn(auto urn)
 {   
     do {} while (urn.next());
 }
 
-void full_iteration_naive_approach_Urn(auto draw, const auto& n, const auto& k)
+void full_forward_iteration_naive_approach_Urn(auto draw, const auto& n, const auto& k)
 {   
     do {
 
-        if(!na::unsorted(draw,k) && !na::repetitions(draw,k)); //Wird das weg optimiert durch den Compiler?
+        if(!na::unsorted(draw,k) && !na::repetitions(draw,k));
        
     } while (na::increment_draw(draw,n,k));
 }
 
-TEST_CASE("Full iteration small Urn")
+void full_forward_iteration_discreture_combinations(const auto& n, const auto& k)
+{   
+    for(const auto& comb : discreture::combinations(4,2));
+}
+
+TEST_CASE("Full forward iteration small Urn")
 {
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::Urn u {4,2};
-        meter.measure([&u] { return full_iteration_old_Urn(u); });
+        meter.measure([&u] { return full_forward_iteration_old_Urn(u); });
     };
 
     BENCHMARK_ADVANCED("urn::Urn")(Catch::Benchmark::Chronometer meter) 
     {
         urn::Urn u {4,2};
-        meter.measure([&u] { return full_iteration_new_Urn(u.begin(), u.end()); });
+        meter.measure([&u] { return full_forward_iteration_new_Urn(u.begin(), u.end()); });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (4,0);
-        meter.measure([&v] { return full_iteration_naive_approach_Urn(v,4,2); });
+        meter.measure([&v] { return full_forward_iteration_naive_approach_Urn(v,4,2); });
+    };
+
+    BENCHMARK_ADVANCED("discreture::combinations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_forward_iteration_discreture_combinations(4,2); });
     };
 }
 
-TEST_CASE("Full iteration mid Urn")
+TEST_CASE("Full forward iteration mid Urn")
 {
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::Urn u {8,3};
-        meter.measure([&u] { return full_iteration_old_Urn(u); });
+        meter.measure([&u] { return full_forward_iteration_old_Urn(u); });
     };
 
     BENCHMARK_ADVANCED("urn::Urn")(Catch::Benchmark::Chronometer meter) 
     {
         urn::Urn u {8,3};
-        meter.measure([&u] { return full_iteration_new_Urn(u.begin(), u.end()); });
+        meter.measure([&u] { return full_forward_iteration_new_Urn(u.begin(), u.end()); });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (8,0);
-        meter.measure([&v] { return full_iteration_naive_approach_Urn(v,8,3); });
+        meter.measure([&v] { return full_forward_iteration_naive_approach_Urn(v,8,3); });
+    };
+
+    BENCHMARK_ADVANCED("discreture::combinations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_forward_iteration_discreture_combinations(8,3); });
     };
 }
 
-TEST_CASE("Full iteration big Urn")
+TEST_CASE("Full forward iteration big Urn")
 {
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::Urn u {9,5};
-        meter.measure([&u] { return full_iteration_old_Urn(u); });
+        meter.measure([&u] { return full_forward_iteration_old_Urn(u); });
     };
 
     BENCHMARK_ADVANCED("urn::Urn")(Catch::Benchmark::Chronometer meter) 
     {
         urn::Urn u {9,5};
-        meter.measure([&u] { return full_iteration_new_Urn(u.begin(), u.end()); });
+        meter.measure([&u] { return full_forward_iteration_new_Urn(u.begin(), u.end()); });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
         std::vector<uint> v (9,0);
-        meter.measure([&v] { return full_iteration_naive_approach_Urn(v,9,5); });
+        meter.measure([&v] { return full_forward_iteration_naive_approach_Urn(v,9,5); });
+    };
+
+    BENCHMARK_ADVANCED("discreture::combinations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_forward_iteration_discreture_combinations(9,5); });
     };
 }
-#endif //URN_FULL_ITERATION
+#endif //URN_FULL_ITERATION_FORWARD_ENABLED
+
+
+
+
+
+
+
+#ifdef URN_FULL_ITERATION_BACKWARD_ENABLED
+//TEST_FUNCTIONS
+void full_iteration_backward_new_Urn(const auto& begin, const auto& end)
+{
+    for(auto it {begin}; it != end; ++it){*it;}
+}
+
+void full_iteration_backward_naive_approach_Urn(std::vector<uint> draw, const auto& n, const auto& k)
+{   
+    do {
+
+        if(!na::unsorted(draw,k) && !na::repetitions(draw,k));
+
+    } while (na::decrement_draw(draw,n,k));
+}
+
+void full_iteration_backward_discreture_combinations(const auto& n, const auto& k)
+{   
+    for(const auto& comb : reversed(discreture::combinations(n,k)));
+}
+
+TEST_CASE("Full backward iteration small Urn")
+{
+    BENCHMARK_ADVANCED("urn::Urn")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::Urn u {4,2};
+        meter.measure([&u] { return full_iteration_backward_new_Urn(u.rbegin(), u.rend()); });
+    };
+
+    BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {2,3};
+        meter.measure([&v] { return full_iteration_backward_naive_approach_Urn(v,4,2); });
+    };
+
+    BENCHMARK_ADVANCED("discreture::combinations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_iteration_backward_discreture_combinations(4,2); });
+    };
+}
+
+TEST_CASE("Full backward iteration mid Urn")
+{
+    BENCHMARK_ADVANCED("urn::Urn")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::Urn u {8,3};
+        meter.measure([&u] { return full_iteration_backward_new_Urn(u.rbegin(), u.rend()); });
+    };
+
+    BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {5,6,7};
+        meter.measure([&v] { return full_iteration_backward_naive_approach_Urn(v,8,3); });
+    };
+
+    BENCHMARK_ADVANCED("discreture::combinations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_iteration_backward_discreture_combinations(8,3); });
+    };
+}
+
+TEST_CASE("Full backward iteration big Urn")
+{
+    BENCHMARK_ADVANCED("urn::Urn")(Catch::Benchmark::Chronometer meter) 
+    {
+        urn::Urn u {9,5};
+        meter.measure([&u] { return full_iteration_backward_new_Urn(u.rbegin(), u.rend()); });
+    };
+
+    BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
+    {
+        std::vector<uint> v {4,5,6,7,8};
+        meter.measure([&v] { return full_iteration_backward_naive_approach_Urn(v,9,5); });
+    };
+
+    BENCHMARK_ADVANCED("discreture::combinations")(Catch::Benchmark::Chronometer meter) 
+    {
+        meter.measure([] { return full_iteration_backward_discreture_combinations(9,5); });
+    };
+}
+#endif //URN_FULL_ITERATION_BACKWARD_ENABLED
 
 
 
@@ -719,7 +1461,7 @@ TEST_CASE("Full iteration big Urn")
 #ifdef URN_SPECIFIC_DRAW_ENABLED
 //TEST_FUNCTIONS
 void specific_draw_new_Urn(auto urn, const uint& specificDraw)
-{   
+{
     urn.draw(specificDraw);
 }
 
@@ -734,8 +1476,8 @@ void specific_draw_old_Urn(auto urn, const uint& specificDraw)
 
 void specific_draw_naive_approach_Urn(auto draw, const uint& n, const uint& k, const uint& specificDraw)
 {   
-    int upCount {-1}; //weil bei 0 wäre es 000
-                      //muss bei UrnR nicht beachtet werden, weil da reps erlaubt
+    uint upCount {};
+
     while(upCount != specificDraw)
     {   
         na::increment_draw(draw,n,k);
@@ -747,24 +1489,88 @@ void specific_draw_naive_approach_Urn(auto draw, const uint& n, const uint& k, c
     }
 }
 
+void specific_draw_discreture_combinations(const uint& n, const uint& k, const uint& specificDraw)
+{   
+    //Die Reihnfolge der Draws ist anders 
+    uint upCount {};
+
+    for (const auto& comb : discreture::combinations(4,2))
+    {
+        if(upCount == specificDraw)
+        {   
+            break;
+        }
+        ++upCount;
+    }
+}
+
 TEST_CASE("Specific draw small Urn")
 {
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::Urn u {4,2};
-        meter.measure([&u] { return specific_draw_old_Urn(u,5); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_Urn(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("urn::Urn")(Catch::Benchmark::Chronometer meter) 
-    {
+    {   
         urn::Urn u {4,2};
-        meter.measure([&u] { return specific_draw_new_Urn(u,5); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_Urn(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
-        std::vector<uint> v (4,0);
-        meter.measure([&v] { return specific_draw_naive_approach_Urn(v,4,2,5); });
+        std::vector<uint> v {0,1};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_naive_approach_Urn(v,4,2,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("discreture::combinations !ANDERE DRAW REIHENFOLGE!")(Catch::Benchmark::Chronometer meter) 
+    {
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,5);
+
+        meter.measure([&gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_discreture_combinations(4,2,randomDraw); 
+        });
     };
 }
 
@@ -773,19 +1579,68 @@ TEST_CASE("Specific draw mid Urn")
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::Urn u {8,3};
-        meter.measure([&u] { return specific_draw_old_Urn(u,55); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,55);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_Urn(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("urn::Urn")(Catch::Benchmark::Chronometer meter) 
     {
         urn::Urn u {8,3};
-        meter.measure([&u] { return specific_draw_new_Urn(u,55); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,55);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_Urn(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
-        std::vector<uint> v (8,0);
-        meter.measure([&v] { return specific_draw_naive_approach_Urn(v,8,3,55); });
+        std::vector<uint> v {0,1,2};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,55);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_naive_approach_Urn(v,8,3,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("discreture::combinations !ANDERE DRAW REIHENFOLGE!")(Catch::Benchmark::Chronometer meter) 
+    {
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,55);
+
+        meter.measure([&gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_discreture_combinations(8,3,randomDraw); 
+        });
     };
 }
 
@@ -794,56 +1649,102 @@ TEST_CASE("Specific draw big Urn")
     BENCHMARK_ADVANCED("urn_old::Urn")(Catch::Benchmark::Chronometer meter) 
     {
         urn_old::Urn u {9,5};
-        meter.measure([&u] { return specific_draw_old_Urn(u,125); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,125);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_old_Urn(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("urn::Urn")(Catch::Benchmark::Chronometer meter) 
     {
         urn::Urn u {9,5};
-        meter.measure([&u] { return specific_draw_new_Urn(u,125); });
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,125);
+
+        meter.measure([&u, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_new_Urn(u,randomDraw); 
+        });
     };
 
     BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
     {
-        std::vector<uint> v (9,0);
-        meter.measure([&v] { return specific_draw_naive_approach_Urn(v,9,5,125); });
+        std::vector<uint> v {0,1,2,3,4};
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,125);
+
+        meter.measure([&v, &gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_naive_approach_Urn(v,9,5,randomDraw); 
+        });
+    };
+
+    BENCHMARK_ADVANCED("discreture::combinations !ANDERE DRAW REIHENFOLGE!")(Catch::Benchmark::Chronometer meter) 
+    {
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,125);
+
+        meter.measure([&gen, &distr] 
+        {   
+            // Zufällige Zahl erzeugen
+            int randomDraw = distr(gen);
+
+            return specific_draw_discreture_combinations(9,5,randomDraw); 
+        });
     };
 }
 #endif //URN_SPECIFIC_DRAW_ENABLED
+//ORDER NOT IMPORTANT, NO REPETITION END
+
 
 
 
 
 /*
-void full_iteration_new_UrnR(const auto& begin, const auto& end)
-{
-    for(auto it {begin}; it != end; ++it)
-    {   
-        for(auto i: *it)
-            std::cout << i;
-        std::cout << std::endl;
-    };
-}
-
-void full_iteration_old_UrnR(auto urn)
-{   
-    do {
-        for(int i{}; i < urn.k(); ++i)
-            std::cout << urn[i];
-        std::cout << std::endl;
-    } while (urn.next());
-}
-
-
 int main()
 {   
-    
-    urn::Urn u {9,5};
-    
-    full_iteration_old_UrnR(u);
-    full_iteration_new_UrnR(u.begin(),u.end());
 
+    //BENCHMARK MIT INITIALISIEREN DRAWS
     
-    return 0;
+    using Draws = std::vector<uint>;
+
+    urn::UrnOR u {3,3};
+    std::vector<Draws> draws {};
+
+    for(auto it {u.begin()}; it != u.end(); ++it)
+    {
+        draws.push_back(*it);
+    }
+
+    std::random_device rd;  
+    std::mt19937 gen(rd()); 
+    std::uniform_int_distribution<> distr(0,26);
+    int randomDraw = distr(gen);
+
+    for(auto i: draws.at(randomDraw))
+        std::cout << i;
+    std::cout << std::endl;
+
+    //BENCHMARK MIT INITIALISIEREN DRAWS
 }
 */
