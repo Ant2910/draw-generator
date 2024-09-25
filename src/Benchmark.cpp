@@ -8,6 +8,7 @@
 #include <vector>
 #include <discreture.hpp> //https://github.com/mraggi/discreture (Andere Permutation und Kombinatorik Bib)
 #include "Benchmark_Config.hpp"
+#include <fstream>
 
 
 //namespace naive approach
@@ -83,7 +84,40 @@ namespace na
 
 
 
+void process_mem_usage(double& vm_usage, double& resident_set)
+{
+    vm_usage     = 0.0;
+    resident_set = 0.0;
 
+    // the two fields we want
+    unsigned long vsize;
+    long rss;
+    
+    std::string ignore;
+    std::ifstream ifs("/proc/self/stat", std::ios_base::in);
+    ifs >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore
+            >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore >> ignore
+            >> ignore >> ignore >> vsize >> rss;
+    ifs.close();
+    
+
+    long page_size_KB = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
+    vm_usage = vsize / 1024.0;
+    resident_set = rss * page_size_KB;
+}
+/*
+RSS is the Resident Set Size and is used to show how much memory is allocated to that process and is in RAM. 
+It does not include memory that is swapped out. It does include memory from shared libraries as long as the pages from those libraries are actually in memory. 
+It does include all stack and heap memory.
+
+VSZ is the Virtual Memory Size. It includes all memory that the process can access, 
+including memory that is swapped out, memory that is allocated, but not used, and memory that is from shared libraries.
+
+So if process A has a 500K binary and is linked to 2500K of shared libraries, has 200K of stack/heap allocations of which 100K is actually in memory (rest is swapped or unused), 
+and it has only actually loaded 1000K of the shared libraries and 400K of its own binary then:
+RSS: 400K + 1000K + 100K = 1500K
+VSZ: 500K + 2500K + 200K = 3200K
+*/
 
 
 
@@ -427,6 +461,139 @@ TEST_CASE("Specific draw big UrnOR")
 }
 #endif //URN_OR_SPECIFIC_DRAW_ENABLED
 //ORDER IMPORTANT, REPETITION IMPORTANT END
+
+
+
+
+
+
+
+#ifdef URN_OR_OLD_PREGENERATED_ENABLED
+TEST_CASE("Pregenerated old UrnOR")
+{   
+    double vmBefore {}, rssBefore {};
+    process_mem_usage(vmBefore, rssBefore);
+    BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
+    {
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,3124);
+
+        
+        meter.measure([&gen, &distr] 
+        {   
+            urn_old::UrnOR u {5,5};
+            int randomDraw = distr(gen);
+            std::vector<std::vector<uint>> draws {};
+            
+            do {
+                std::vector<uint> draw {};
+                for(int i {}; i < u.k(); ++i)
+                {
+                    draw.push_back(u[i]);
+                }
+                draws.push_back(draw);
+
+            } while (u.next());
+
+            draws.at(randomDraw);
+        });
+        
+    };
+    double vmAfter {}, rssAfter {};
+    process_mem_usage(vmAfter, rssAfter);
+    double vmDiff = vmAfter - vmBefore;
+    double rssDiff = rssAfter - rssBefore;
+    WARN("Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?");
+}
+#endif //URN_OR_OLD_PREGENERATED_ENABLED
+
+
+#ifdef URN_OR_NEW_PREGENERATED_ENABLED
+TEST_CASE("Pregenerated new UrnOR")
+{   
+    double vmBefore {}, rssBefore {};
+    process_mem_usage(vmBefore, rssBefore);
+    BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
+    {
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,3124);
+
+        
+        meter.measure([&gen, &distr] 
+        {   
+            urn::UrnOR u {5,5};
+            int randomDraw = distr(gen);
+            std::vector<std::vector<uint>> draws {};
+            
+            for(auto it {u.begin()}; it != u.end(); ++it)
+            {
+                draws.push_back(*it);
+            }
+
+            draws.at(randomDraw);
+        });
+        
+    };
+    double vmAfter {}, rssAfter {};
+    process_mem_usage(vmAfter, rssAfter);
+    double vmDiff = vmAfter - vmBefore;
+    double rssDiff = rssAfter - rssBefore;
+    WARN("Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?");
+}
+#endif //URN_OR_NEW_PREGENERATED_ENABLED
+
+
+#ifdef URN_OR_NAIVE_APPROACH_PREGENERATED_ENABLED
+TEST_CASE("Pregenerated naive_approach UrnOR")
+{   
+    double vmBefore {}, rssBefore {};
+    process_mem_usage(vmBefore, rssBefore);
+    BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
+    {
+        // Zufallszahlengenerator und Verteilung initialisieren
+        std::random_device rd;  
+        std::mt19937 gen(rd()); 
+        std::uniform_int_distribution<> distr(0,3124);
+
+        
+        meter.measure([&gen, &distr] 
+        {   
+            std::vector<uint> v (5,0);
+            int randomDraw = distr(gen);
+            std::vector<std::vector<uint>> draws {};
+            
+            do {
+                std::vector<uint> draw {};
+                for(int i {}; i < v.size(); ++i)
+                {
+                    draw.push_back(v.at(i));
+                }
+                draws.push_back(draw);
+
+            } while (na::increment_draw(v,5,5));
+
+            draws.at(randomDraw);
+        });
+        
+    };
+    double vmAfter {}, rssAfter {};
+    process_mem_usage(vmAfter, rssAfter);
+    double vmDiff = vmAfter - vmBefore;
+    double rssDiff = rssAfter - rssBefore;
+    WARN("Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?");
+}
+#endif //URN_OR_NAIVE_APPROACH_PREGENERATED_ENABLED
+
+
+
+
+
+
+
 
 
 
@@ -1720,31 +1887,148 @@ TEST_CASE("Specific draw big Urn")
 
 
 
-/*
+
+
+
+
 int main()
 {   
+    /*
+    double vmBefore {}, rssBefore {};
+    process_mem_usage(vmBefore, rssBefore);
 
-    //BENCHMARK MIT INITIALISIEREN DRAWS
+    // Zufallszahlengenerator und Verteilung initialisieren
+    std::random_device rd;  
+    std::mt19937 gen(rd()); 
+    std::uniform_int_distribution<> distr(0,3124);
+
     
-    using Draws = std::vector<uint>;
+    std::vector<uint> v (5,0);
+    int randomDraw = distr(gen);
+    std::vector<std::vector<uint>> draws {};
+    
+    do {
+        std::vector<uint> draw {};
+        for(int i {}; i < v.size(); ++i)
+        {
+            draw.push_back(v.at(i));
+        }
+        draws.push_back(draw);
 
-    urn::UrnOR u {3,3};
-    std::vector<Draws> draws {};
+    } while (na::increment_draw(v,5,5));
 
+    for(auto i: draws.at(randomDraw))
+    {
+        std::cout << i;
+    }
+    std::cout << std::endl;
+
+    double vmAfter {}, rssAfter {};
+    process_mem_usage(vmAfter, rssAfter);
+    double vmDiff = vmAfter - vmBefore;
+    double rssDiff = rssAfter - rssBefore;
+
+    std::cout << "Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?" << std::endl;
+    
+    //BENCHMARK
+    //1004 VM
+    //3700 - 3800 RSS
+    
+    //MAIN
+    //176 VM
+    //1500-1700 RSS
+    
+
+
+    //Gibt auf meinem PC 176 ?KB?
+    //In der Benchmark 1004  ?KB?
+
+
+    
+    double vmBefore {}, rssBefore {};
+    process_mem_usage(vmBefore, rssBefore);
+
+    // Zufallszahlengenerator und Verteilung initialisieren
+    std::random_device rd;  
+    std::mt19937 gen(rd()); 
+    std::uniform_int_distribution<> distr(0,3124);
+
+    
+
+    urn_old::UrnOR u {5,5};
+    int randomDraw = distr(gen);
+    std::vector<std::vector<uint>> draws {};
+    
+    do {
+        std::vector<uint> draw {};
+        for(int i {}; i < u.k(); ++i)
+        {
+            draw.push_back(u[i]);
+        }
+        draws.push_back(draw);
+
+    } while (u.next());
+
+    for(auto i: draws.at(randomDraw))
+    {
+        std::cout << i;
+    }
+    std::cout << std::endl;
+
+    double vmAfter {}, rssAfter {};
+    process_mem_usage(vmAfter, rssAfter);
+    double vmDiff = vmAfter - vmBefore;
+    double rssDiff = rssAfter - rssBefore;
+
+    std::cout << "Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?" << std::endl;
+    
+    //MAIN
+    //176 VM
+    //1500-1700 RSS
+
+    //BENCHMARK
+    //1004 VM
+    //3700 RSS
+    */
+    
+    double vmBefore {}, rssBefore {};
+    process_mem_usage(vmBefore, rssBefore);
+
+    // Zufallszahlengenerator und Verteilung initialisieren
+    std::random_device rd;  
+    std::mt19937 gen(rd()); 
+    std::uniform_int_distribution<> distr(0,3124);
+
+        
+
+    urn::UrnOR u {5,5};
+    int randomDraw = distr(gen);
+    std::vector<std::vector<uint>> draws {};
+    
     for(auto it {u.begin()}; it != u.end(); ++it)
     {
         draws.push_back(*it);
     }
 
-    std::random_device rd;  
-    std::mt19937 gen(rd()); 
-    std::uniform_int_distribution<> distr(0,26);
-    int randomDraw = distr(gen);
-
     for(auto i: draws.at(randomDraw))
+    {
         std::cout << i;
+    }
     std::cout << std::endl;
 
-    //BENCHMARK MIT INITIALISIEREN DRAWS
+    double vmAfter {}, rssAfter {};
+    process_mem_usage(vmAfter, rssAfter);
+    double vmDiff = vmAfter - vmBefore;
+    double rssDiff = rssAfter - rssBefore;
+
+    std::cout << "Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?" << std::endl;
+    
+    //MAIN
+    //176 VM
+    //1700-1800 RSS
+
+    //BENCHMARK
+    //912 VM
+    //3300 - 3500 RSS
+
 }
-*/
