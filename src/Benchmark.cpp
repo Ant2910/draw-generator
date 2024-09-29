@@ -9,7 +9,7 @@
 #include <discreture.hpp> //https://github.com/mraggi/discreture (Andere Permutation und Kombinatorik Bib)
 #include "Benchmark_Config.hpp"
 #include <fstream>
-
+#include <unistd.h>
 
 //namespace naive approach
 namespace na
@@ -461,139 +461,6 @@ TEST_CASE("Specific draw big UrnOR")
 }
 #endif //URN_OR_SPECIFIC_DRAW_ENABLED
 //ORDER IMPORTANT, REPETITION IMPORTANT END
-
-
-
-
-
-
-
-#ifdef URN_OR_OLD_PREGENERATED_ENABLED
-TEST_CASE("Pregenerated old UrnOR")
-{   
-    double vmBefore {}, rssBefore {};
-    process_mem_usage(vmBefore, rssBefore);
-    BENCHMARK_ADVANCED("urn_old::UrnOR")(Catch::Benchmark::Chronometer meter) 
-    {
-        // Zufallszahlengenerator und Verteilung initialisieren
-        std::random_device rd;  
-        std::mt19937 gen(rd()); 
-        std::uniform_int_distribution<> distr(0,3124);
-
-        
-        meter.measure([&gen, &distr] 
-        {   
-            urn_old::UrnOR u {5,5};
-            int randomDraw = distr(gen);
-            std::vector<std::vector<uint>> draws {};
-            
-            do {
-                std::vector<uint> draw {};
-                for(int i {}; i < u.k(); ++i)
-                {
-                    draw.push_back(u[i]);
-                }
-                draws.push_back(draw);
-
-            } while (u.next());
-
-            draws.at(randomDraw);
-        });
-        
-    };
-    double vmAfter {}, rssAfter {};
-    process_mem_usage(vmAfter, rssAfter);
-    double vmDiff = vmAfter - vmBefore;
-    double rssDiff = rssAfter - rssBefore;
-    WARN("Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?");
-}
-#endif //URN_OR_OLD_PREGENERATED_ENABLED
-
-
-#ifdef URN_OR_NEW_PREGENERATED_ENABLED
-TEST_CASE("Pregenerated new UrnOR")
-{   
-    double vmBefore {}, rssBefore {};
-    process_mem_usage(vmBefore, rssBefore);
-    BENCHMARK_ADVANCED("urn::UrnOR")(Catch::Benchmark::Chronometer meter) 
-    {
-        // Zufallszahlengenerator und Verteilung initialisieren
-        std::random_device rd;  
-        std::mt19937 gen(rd()); 
-        std::uniform_int_distribution<> distr(0,3124);
-
-        
-        meter.measure([&gen, &distr] 
-        {   
-            urn::UrnOR u {5,5};
-            int randomDraw = distr(gen);
-            std::vector<std::vector<uint>> draws {};
-            
-            for(auto it {u.begin()}; it != u.end(); ++it)
-            {
-                draws.push_back(*it);
-            }
-
-            draws.at(randomDraw);
-        });
-        
-    };
-    double vmAfter {}, rssAfter {};
-    process_mem_usage(vmAfter, rssAfter);
-    double vmDiff = vmAfter - vmBefore;
-    double rssDiff = rssAfter - rssBefore;
-    WARN("Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?");
-}
-#endif //URN_OR_NEW_PREGENERATED_ENABLED
-
-
-#ifdef URN_OR_NAIVE_APPROACH_PREGENERATED_ENABLED
-TEST_CASE("Pregenerated naive_approach UrnOR")
-{   
-    double vmBefore {}, rssBefore {};
-    process_mem_usage(vmBefore, rssBefore);
-    BENCHMARK_ADVANCED("na::naive_approach")(Catch::Benchmark::Chronometer meter) 
-    {
-        // Zufallszahlengenerator und Verteilung initialisieren
-        std::random_device rd;  
-        std::mt19937 gen(rd()); 
-        std::uniform_int_distribution<> distr(0,3124);
-
-        
-        meter.measure([&gen, &distr] 
-        {   
-            std::vector<uint> v (5,0);
-            int randomDraw = distr(gen);
-            std::vector<std::vector<uint>> draws {};
-            
-            do {
-                std::vector<uint> draw {};
-                for(int i {}; i < v.size(); ++i)
-                {
-                    draw.push_back(v.at(i));
-                }
-                draws.push_back(draw);
-
-            } while (na::increment_draw(v,5,5));
-
-            draws.at(randomDraw);
-        });
-        
-    };
-    double vmAfter {}, rssAfter {};
-    process_mem_usage(vmAfter, rssAfter);
-    double vmDiff = vmAfter - vmBefore;
-    double rssDiff = rssAfter - rssBefore;
-    WARN("Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?");
-}
-#endif //URN_OR_NAIVE_APPROACH_PREGENERATED_ENABLED
-
-
-
-
-
-
-
 
 
 
@@ -1886,149 +1753,73 @@ TEST_CASE("Specific draw big Urn")
 
 
 
-
-
-
-
-
+#ifdef MEMORY_BENCHMARK_ENABLED
 int main()
 {   
-    /*
-    double vmBefore {}, rssBefore {};
-    process_mem_usage(vmBefore, rssBefore);
+    /****************************************************
+    *                                                  *
+    *                       UrnOR                      *
+    *                                                  *
+    ****************************************************/
 
     // Zufallszahlengenerator und Verteilung initialisieren
     std::random_device rd;  
     std::mt19937 gen(rd()); 
     std::uniform_int_distribution<> distr(0,3124);
+    int randomDrawUrnOR = distr(gen);
 
-    
-    std::vector<uint> v (5,0);
-    int randomDraw = distr(gen);
-    std::vector<std::vector<uint>> draws {};
-    
-    do {
-        std::vector<uint> draw {};
-        for(int i {}; i < v.size(); ++i)
-        {
-            draw.push_back(v.at(i));
-        }
-        draws.push_back(draw);
-
-    } while (na::increment_draw(v,5,5));
-
-    for(auto i: draws.at(randomDraw))
-    {
-        std::cout << i;
-    }
-    std::cout << std::endl;
-
-    double vmAfter {}, rssAfter {};
-    process_mem_usage(vmAfter, rssAfter);
-    double vmDiff = vmAfter - vmBefore;
-    double rssDiff = rssAfter - rssBefore;
-
-    std::cout << "Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?" << std::endl;
-    
-    //BENCHMARK
-    //1004 VM
-    //3700 - 3800 RSS
-    
-    //MAIN
-    //176 VM
-    //1500-1700 RSS
-    
-
-
-    //Gibt auf meinem PC 176 ?KB?
-    //In der Benchmark 1004  ?KB?
-
-
-    
-    double vmBefore {}, rssBefore {};
-    process_mem_usage(vmBefore, rssBefore);
-
-    // Zufallszahlengenerator und Verteilung initialisieren
-    std::random_device rd;  
-    std::mt19937 gen(rd()); 
-    std::uniform_int_distribution<> distr(0,3124);
-
-    
-
-    urn_old::UrnOR u {5,5};
-    int randomDraw = distr(gen);
-    std::vector<std::vector<uint>> draws {};
-    
-    do {
-        std::vector<uint> draw {};
-        for(int i {}; i < u.k(); ++i)
-        {
-            draw.push_back(u[i]);
-        }
-        draws.push_back(draw);
-
-    } while (u.next());
-
-    for(auto i: draws.at(randomDraw))
-    {
-        std::cout << i;
-    }
-    std::cout << std::endl;
-
-    double vmAfter {}, rssAfter {};
-    process_mem_usage(vmAfter, rssAfter);
-    double vmDiff = vmAfter - vmBefore;
-    double rssDiff = rssAfter - rssBefore;
-
-    std::cout << "Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?" << std::endl;
-    
-    //MAIN
-    //176 VM
-    //1500-1700 RSS
-
-    //BENCHMARK
-    //1004 VM
-    //3700 RSS
-    */
-    
-    double vmBefore {}, rssBefore {};
-    process_mem_usage(vmBefore, rssBefore);
-
-    // Zufallszahlengenerator und Verteilung initialisieren
-    std::random_device rd;  
-    std::mt19937 gen(rd()); 
-    std::uniform_int_distribution<> distr(0,3124);
-
+    #ifdef URN_OR_NAIVE_APPROACH_PREGENERATED_ENABLED
+        std::vector<uint> v (5,0);
+        std::vector<std::vector<uint>> draws {};
         
+        do {
+            std::vector<uint> draw {};
+            for(int i {}; i < v.size(); ++i)
+            {
+                draw.push_back(v.at(i));
+            }
+            draws.push_back(draw);
 
-    urn::UrnOR u {5,5};
-    int randomDraw = distr(gen);
-    std::vector<std::vector<uint>> draws {};
+        } while (na::increment_draw(v,5,5));
+
+        for(auto i: draws.at(randomDrawUrnOR)){}
+        sleep(1); //Damit cmdbench genung Zeit zum messen hat
+    #endif //URN_OR_NAIVE_APPROACH_PREGENERATED_ENABLED
     
-    for(auto it {u.begin()}; it != u.end(); ++it)
-    {
-        draws.push_back(*it);
-    }
 
-    for(auto i: draws.at(randomDraw))
-    {
-        std::cout << i;
-    }
-    std::cout << std::endl;
+    #ifdef URN_OR_OLD_PREGENERATED_ENABLED
+        urn_old::UrnOR u {5,5};
+        std::vector<std::vector<uint>> draws {};
+        
+        do {
+            std::vector<uint> draw {};
+            for(int i {}; i < u.k(); ++i)
+            {
+                draw.push_back(u[i]);
+            }
+            draws.push_back(draw);
 
-    double vmAfter {}, rssAfter {};
-    process_mem_usage(vmAfter, rssAfter);
-    double vmDiff = vmAfter - vmBefore;
-    double rssDiff = rssAfter - rssBefore;
+        } while (u.next());
 
-    std::cout << "Speicherverbrauch VM: " << vmDiff << " ?KB?" << "\n" << "Speicherverbrauch RSS: " << rssDiff << " ?KB?" << std::endl;
+        for(auto i: draws.at(randomDrawUrnOR)){}
+        sleep(1); //Damit cmdbench genung Zeit zum messen hat
+    #endif //URN_OR_OLD_PREGENERATED_ENABLED
+
     
-    //MAIN
-    //176 VM
-    //1700-1800 RSS
+    #ifdef URN_OR_NEW_PREGENERATED_ENABLED
+        urn::UrnOR u {5,5};
+        int randomDraw = distr(gen);
+        std::vector<std::vector<uint>> draws {};
+        
+        for(auto it {u.begin()}; it != u.end(); ++it)
+        {
+            draws.push_back(*it);
+        }
 
-    //BENCHMARK
-    //912 VM
-    //3300 - 3500 RSS
-
+        for(auto i: draws.at(randomDrawUrnOR)){}
+        sleep(1); //Damit cmdbench genung Zeit zum messen hat
+    #endif //URN_OR_NEW_PREGENERATED_ENABLED
+     
+    
 }
+#endif //MEMORY_BENCHMARK_ENABLED

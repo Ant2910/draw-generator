@@ -13,9 +13,15 @@ Benchmark soll nicht enthalten sein => 0
 #define URN_OR_SPECIFIC_DRAW 0
 
 //Um den Speicher zu messen müssen diese einzeln laufen
-#define URN_OR_OLD_PREGENERATED 0
+#define MEMORY_BENCHMARK 0
+
 #define URN_OR_NEW_PREGENERATED 0
+#define URN_OR_OLD_PREGENERATED 0
 #define URN_OR_NAIVE_APPROACH_PREGENERATED 0
+
+//cmdbench --iterations 10 --print-averages --save-plot=plot.png ./benchmarks
+
+
 
 
 
@@ -38,7 +44,11 @@ Benchmark soll nicht enthalten sein => 0
 
 
 
-//CONFIG AUSWERTUNGEN-
+//CONFIG AUSWERTUNGEN
+#if MEMORY_BENCHMARK
+    #define MEMORY_BENCHMARK_ENABLED
+#endif //MEMORY_BENCHMARK
+
 #if URN_OR_FULL_ITERATION_FORWARD
     #define URN_OR_FULL_ITERATION_FORWARD_ENABLED
 #endif //URN_OR_FULL_ITERATION 
